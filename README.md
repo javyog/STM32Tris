@@ -1,4 +1,4 @@
 # STM32Tris
 
-Recreation of the classical Testris using a STM32F103C8T6.
-The project will have a custom PCB made with Kicad and the embedeed SW done with a OpenSouce tool chain.
+Recreation of the classic Testris using a STM32F103C8T6 MCU from ST.
+The project will have a custom PCB made with KiCad. The embedeed SW wil be done with the help of a OpenSource tool chain.
