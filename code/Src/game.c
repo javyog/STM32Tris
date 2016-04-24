@@ -4,10 +4,68 @@
  *  Created on: Apr 24, 2016
  *      Author: javy
  */
+	/* Includes */
 	#include "stm32f1xx_hal.h"
 	#include "game.h"
 
+	/* Variables */
+	const screenMatrix gameOver = {
+									{0,0,0,0,0,0,0,0},
+								    {0,0,0,0,0,0,0,0},
+								    {0,0,0,0,0,0,0,0},
+								    {0,0,0,0,0,0,0,0},
+								    {0,0,0,0,0,0,0,0},
+								    {0,0,0,0,0,0,0,0},
+								    {0,0,0,0,0,0,0,0},
+								    {0,0,0,0,0,0,0,0},
+								    {0,0,0,0,0,0,0,0},
+								    {0,0,0,0,0,0,1,0},
+								    {0,0,0,0,1,1,0,0},
+								    {0,1,0,0,1,0,1,0},
+								    {0,1,0,0,1,0,1,0},
+								    {0,1,0,0,0,0,1,0},
+								    {0,0,1,1,1,1,0,0},
+								    {0,0,0,0,0,0,0,0}
+								   };
+	screenMatrix gameMatrix = {{0}};
 
+
+	 /* With every button interrupt we have to refresh the counter*/
+	void GAME_goToSleepTask_1000ms(void);
+
+	/* Function to move a block left -- eg. (*gameMatrix)[1][0] = 7;*/
+	void GAME_moveLeft(screenMatrix *gameMatrix){
+			}
+
+	/* Function to move a block right */
+	void GAME_moveRight(screenMatrix *gameMatrix){
+
+	}
+
+	/* Function to move a block to the bottom */
+	void GAME_moveBottom(screenMatrix *gameMatrix){
+
+	}
+
+	/* Show lines killed after GAME OVER */
+	void GAME_showResults(screenMatrix *gameMatrix){
+
+	}
+
+	/* Show GAME OVER screen */
+	void GAME_showGameOver(screenMatrix *gameMatrix){
+		uint8_t i;
+		uint8_t j;
+		for(i = 0; i < ROW; i++){
+			for (j = 0; j < COLUMN; j++) (*gameMatrix)[ROW][COLUMN] = gameOver[ROW][COLUMN];
+		}
+
+	}
+
+	/* Save the score to the flash for having a ranking*/
+	void GAME_saveScore(uint32_t lines){
+
+	}
 
 	/* Game configuration */
 	void GAME_Config(void){
