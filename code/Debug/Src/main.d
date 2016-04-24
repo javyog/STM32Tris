@@ -21,7 +21,9 @@ Src/main.o: ../Src/main.c \
  /home/javy/Proyectos/STM32Tris/code/Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h \
  /home/javy/Proyectos/STM32Tris/code/Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h \
  /home/javy/Proyectos/STM32Tris/code/Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h \
- /home/javy/Proyectos/STM32Tris/code/Inc/gpio.h
+ /home/javy/Proyectos/STM32Tris/code/Inc/gpio.h \
+ /home/javy/Proyectos/STM32Tris/code/Inc/osd_api.h \
+ /home/javy/Proyectos/STM32Tris/code/Inc/game.h
 
 /home/javy/Proyectos/STM32Tris/code/Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h:
 
@@ -68,3 +70,7 @@ Src/main.o: ../Src/main.c \
 /home/javy/Proyectos/STM32Tris/code/Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h:
 
 /home/javy/Proyectos/STM32Tris/code/Inc/gpio.h:
+
+/home/javy/Proyectos/STM32Tris/code/Inc/osd_api.h:
+
+/home/javy/Proyectos/STM32Tris/code/Inc/game.h:
