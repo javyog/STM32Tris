@@ -92,10 +92,10 @@
 #define MATRIX_Y13_GPIO_Port GPIOA
 #define MATRIX_Y8_Pin GPIO_PIN_3
 #define MATRIX_Y8_GPIO_Port GPIOB
-#define MATRIX_14_Pin GPIO_PIN_4
-#define MATRIX_14_GPIO_Port GPIOB
-#define MATRIX_15_Pin GPIO_PIN_5
-#define MATRIX_15_GPIO_Port GPIOB
+#define MATRIX_Y14_Pin GPIO_PIN_4
+#define MATRIX_Y14_GPIO_Port GPIOB
+#define MATRIX_Y15_Pin GPIO_PIN_5
+#define MATRIX_Y15_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

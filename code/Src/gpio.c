@@ -74,7 +74,7 @@ void MX_GPIO_Init(void)
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, MATRIX_X0_Pin|MATRIX_Y3_Pin|MATRIX_Y5_Pin|MATRIX_X3_Pin 
-                          |MATRIX_Y0_Pin|MATRIX_Y8_Pin|MATRIX_14_Pin|MATRIX_15_Pin, GPIO_PIN_RESET);
+                          |MATRIX_Y0_Pin|MATRIX_Y8_Pin|MATRIX_Y14_Pin|MATRIX_Y15_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : PtPin */
   GPIO_InitStruct.Pin = STATUS_LED_Pin;
@@ -103,7 +103,7 @@ void MX_GPIO_Init(void)
   /*Configure GPIO pins : PBPin PBPin PBPin PBPin 
                            PBPin PBPin PBPin PBPin */
   GPIO_InitStruct.Pin = MATRIX_X0_Pin|MATRIX_Y3_Pin|MATRIX_Y5_Pin|MATRIX_X3_Pin 
-                          |MATRIX_Y0_Pin|MATRIX_Y8_Pin|MATRIX_14_Pin|MATRIX_15_Pin;
+                          |MATRIX_Y0_Pin|MATRIX_Y8_Pin|MATRIX_Y14_Pin|MATRIX_Y15_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);

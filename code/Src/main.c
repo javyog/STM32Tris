@@ -8,12 +8,10 @@
 
 
 /* Include external APIs */
+	#include <osd.h>
 	#include "stm32f1xx_hal.h"
 	#include "gpio.h"
-	#include "osd_api.h"
 	#include "game.h"
-
-
 
 	int main(void)
 	{
@@ -21,7 +19,10 @@
 		/* Reset of all peripherals, Initializes the Flash interface and the Systick. */
 		HAL_Init();
 
-		/* Configure the game and the system clock */
+		/* Configure system clock tick for the scheduler*/
+		SystemClock_Config();
+
+		/* Configure the game and */
 		GAME_Config();
 
 		/* Initialize all configured peripherals */
