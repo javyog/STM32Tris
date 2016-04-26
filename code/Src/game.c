@@ -93,8 +93,7 @@
 
 	/* Refreshes the screen */
 	void GAME_refreshScreenTask_20ms(void){
-		GAME_showGameOver();
-		MATRIX_refreshMatrix(gameMatrix);
+		MATRIX_testScreen();
 	}
 
 	/* Move down block task*/

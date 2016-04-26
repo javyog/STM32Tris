@@ -16,13 +16,17 @@
     /* Refreshes */
 	void MATRIX_refreshMatrix(screenMatrix matrix);
 
-	/* Aux function to select the common cathode pin  */
-	void MATRIX_selectCommonCathode(uint8_t cathode);
+	/* Aux function to select the common cathode pin (0-7)*/
+	void MATRIX_selectX(uint8_t cathode);
 
-	/* draws a single line when the common cathode is selected */
-    void MATRIX_drawLine(uint8_t *line, uint8_t cathode);
+	/* draws a single column (cathode)*/
+    void MATRIX_drawY(screenMatrix matrix, uint8_t cathode);
+
+    /* de-selects all X (columns)*/
+    void MATRIX_resetX(void);
 
     /* This function will transform the values at the current matrix to PIN states (SET / RESET)*/
     GPIO_PinState MATRIX_ledValue(uint8_t value);
 
+    void MATRIX_testScreen(void);
 	#endif /* INC_LEDMATRIX_16X8_H_ */
