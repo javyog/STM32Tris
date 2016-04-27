@@ -51,6 +51,8 @@
         * Output
         * EVENT_OUT
         * EXTI
+        * Free pins are configured automatically as Analog (this feature is enabled through 
+        * the Code Generation settings)
 */
 void MX_GPIO_Init(void)
 {
@@ -63,53 +65,44 @@ void MX_GPIO_Init(void)
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(STATUS_LED_GPIO_Port, STATUS_LED_Pin, GPIO_PIN_RESET);
+  /*Configure GPIO pin : PC13 */
+  GPIO_InitStruct.Pin = GPIO_PIN_13;
+  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : PAPin PAPin PAPin PAPin 
+                           PAPin PAPin PAPin PAPin 
+                           PAPin PAPin PAPin PAPin 
+                           PAPin */
+  GPIO_InitStruct.Pin = MATRIX_X4_Pin|MATRIX_X6_Pin|MATRIX_Y6_Pin|MATRIX_Y5_Pin 
+                          |MATRIX_X7_Pin|MATRIX_Y3_Pin|MATRIX_X5_Pin|MATRIX_X2_Pin 
+                          |MATRIX_X1_Pin|MATRIX_Y1_Pin|MATRIX_Y0_Pin|MATRIX_Y14_Pin 
+                          |MATRIX_Y13_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : PBPin PBPin PBPin PBPin 
+                           PBPin PBPin PBPin PBPin 
+                           PBPin PBPin PBPin */
+  GPIO_InitStruct.Pin = MATRIX_Y10_Pin|MATRIX_Y15_Pin|MATRIX_Y9_Pin|MATRIX_X0_Pin 
+                          |MATRIX_Y4_Pin|MATRIX_Y2_Pin|MATRIX_X3_Pin|MATRIX_Y7_Pin 
+                          |MATRIX_Y8_Pin|MATRIX_Y11_Pin|MATRIX_Y12_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, MATRIX_X4_Pin|MATRIX_X6_Pin|MATRIX_Y6_Pin|MATRIX_Y5_Pin 
                           |MATRIX_X7_Pin|MATRIX_Y3_Pin|MATRIX_X5_Pin|MATRIX_X2_Pin 
                           |MATRIX_X1_Pin|MATRIX_Y1_Pin|MATRIX_Y0_Pin|MATRIX_Y14_Pin 
-                          |MATRIX_Y13_Pin|MATRIX_Y10_Pin, GPIO_PIN_RESET);
+                          |MATRIX_Y13_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, MATRIX_X0_Pin|MATRIX_Y4_Pin|MATRIX_Y2_Pin|MATRIX_X3_Pin 
-                          |MATRIX_Y7_Pin|MATRIX_Y15_Pin|MATRIX_Y9_Pin|MATRIX_Y8_Pin 
-                          |MATRIX_Y11_Pin|MATRIX_Y12_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin : PtPin */
-  GPIO_InitStruct.Pin = STATUS_LED_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(STATUS_LED_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : PAPin PAPin PAPin PAPin 
-                           PAPin PAPin PAPin PAPin 
-                           PAPin PAPin PAPin PAPin 
-                           PAPin PAPin */
-  GPIO_InitStruct.Pin = MATRIX_X4_Pin|MATRIX_X6_Pin|MATRIX_Y6_Pin|MATRIX_Y5_Pin 
-                          |MATRIX_X7_Pin|MATRIX_Y3_Pin|MATRIX_X5_Pin|MATRIX_X2_Pin 
-                          |MATRIX_X1_Pin|MATRIX_Y1_Pin|MATRIX_Y0_Pin|MATRIX_Y14_Pin 
-                          |MATRIX_Y13_Pin|MATRIX_Y10_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : PBPin PBPin PBPin PBPin */
-  GPIO_InitStruct.Pin = BUTTON_UP_Pin|BUTTON_DOWN_Pin|BUTTON_LEFT_Pin|BUTTON_RIGHT_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : PBPin PBPin PBPin PBPin 
-                           PBPin PBPin PBPin PBPin 
-                           PBPin PBPin */
-  GPIO_InitStruct.Pin = MATRIX_X0_Pin|MATRIX_Y4_Pin|MATRIX_Y2_Pin|MATRIX_X3_Pin 
-                          |MATRIX_Y7_Pin|MATRIX_Y15_Pin|MATRIX_Y9_Pin|MATRIX_Y8_Pin 
-                          |MATRIX_Y11_Pin|MATRIX_Y12_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+  HAL_GPIO_WritePin(GPIOB, MATRIX_Y10_Pin|MATRIX_Y15_Pin|MATRIX_Y9_Pin|MATRIX_X0_Pin 
+                          |MATRIX_Y4_Pin|MATRIX_Y2_Pin|MATRIX_X3_Pin|MATRIX_Y7_Pin 
+                          |MATRIX_Y8_Pin|MATRIX_Y11_Pin|MATRIX_Y12_Pin, GPIO_PIN_RESET);
 
 }
 

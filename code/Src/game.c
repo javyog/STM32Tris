@@ -98,7 +98,7 @@
 
 	/* Move down block task*/
 	void GAME_BlockDownTask_1000ms(void){
-		HAL_GPIO_TogglePin(STATUS_LED_GPIO_Port, STATUS_LED_Pin);
+		//HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_1);
 
 	}
 

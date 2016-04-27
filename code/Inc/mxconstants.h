@@ -38,8 +38,6 @@
 
 /* Private define ------------------------------------------------------------*/
 
-#define STATUS_LED_Pin GPIO_PIN_13
-#define STATUS_LED_GPIO_Port GPIOC
 #define MATRIX_X4_Pin GPIO_PIN_0
 #define MATRIX_X4_GPIO_Port GPIOA
 #define MATRIX_X6_Pin GPIO_PIN_1
@@ -56,14 +54,12 @@
 #define MATRIX_X5_GPIO_Port GPIOA
 #define MATRIX_X2_Pin GPIO_PIN_7
 #define MATRIX_X2_GPIO_Port GPIOA
-#define BUTTON_UP_Pin GPIO_PIN_0
-#define BUTTON_UP_GPIO_Port GPIOB
-#define BUTTON_DOWN_Pin GPIO_PIN_1
-#define BUTTON_DOWN_GPIO_Port GPIOB
-#define BUTTON_LEFT_Pin GPIO_PIN_2
-#define BUTTON_LEFT_GPIO_Port GPIOB
-#define BUTTON_RIGHT_Pin GPIO_PIN_10
-#define BUTTON_RIGHT_GPIO_Port GPIOB
+#define MATRIX_Y10_Pin GPIO_PIN_0
+#define MATRIX_Y10_GPIO_Port GPIOB
+#define MATRIX_Y15_Pin GPIO_PIN_1
+#define MATRIX_Y15_GPIO_Port GPIOB
+#define MATRIX_Y9_Pin GPIO_PIN_8
+#define MATRIX_Y9_GPIO_Port GPIOB
 #define MATRIX_X0_Pin GPIO_PIN_11
 #define MATRIX_X0_GPIO_Port GPIOB
 #define MATRIX_Y4_Pin GPIO_PIN_12
@@ -84,17 +80,11 @@
 #define MATRIX_Y14_GPIO_Port GPIOA
 #define MATRIX_Y13_Pin GPIO_PIN_12
 #define MATRIX_Y13_GPIO_Port GPIOA
-#define MATRIX_Y10_Pin GPIO_PIN_15
-#define MATRIX_Y10_GPIO_Port GPIOA
-#define MATRIX_Y15_Pin GPIO_PIN_3
-#define MATRIX_Y15_GPIO_Port GPIOB
-#define MATRIX_Y9_Pin GPIO_PIN_4
-#define MATRIX_Y9_GPIO_Port GPIOB
 #define MATRIX_Y8_Pin GPIO_PIN_5
 #define MATRIX_Y8_GPIO_Port GPIOB
-#define MATRIX_Y11_Pin GPIO_PIN_8
+#define MATRIX_Y11_Pin GPIO_PIN_6
 #define MATRIX_Y11_GPIO_Port GPIOB
-#define MATRIX_Y12_Pin GPIO_PIN_9
+#define MATRIX_Y12_Pin GPIO_PIN_7
 #define MATRIX_Y12_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 

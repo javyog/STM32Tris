@@ -31,13 +31,12 @@
   ******************************************************************************
   */
 /* Includes ------------------------------------------------------------------*/
-#include <osd.h>	/* Needed for the basic task scheduler*/
 #include "stm32f1xx_hal.h"
 #include "stm32f1xx.h"
 #include "stm32f1xx_it.h"
+#include "osd.h"
 
 /* USER CODE BEGIN 0 */
-/* External api*/
 
 /* USER CODE END 0 */
 
@@ -147,13 +146,10 @@ void DebugMon_Handler(void)
 void SysTick_Handler(void)
 {
   /* USER CODE BEGIN SysTick_IRQn 0 */
-
   OSD_Scheduler();
-
   /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();
   HAL_SYSTICK_IRQHandler();
-
   /* USER CODE BEGIN SysTick_IRQn 1 */
 
   /* USER CODE END SysTick_IRQn 1 */

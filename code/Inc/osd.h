@@ -14,7 +14,7 @@
     /* Defines */
  
      #define USE_BASIC_OSD
-     #define OSD_SYSTEM_TICK_ms (5u) /* SysTick = 1ms */     
+     #define OSD_SYSTEM_TICK_ms (1u) /* SysTick = 1ms */     
      
      #ifdef USE_BASIC_OSD
         #ifndef OSD_COUNTERS

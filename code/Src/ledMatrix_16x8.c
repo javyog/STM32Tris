@@ -5,12 +5,13 @@
  *      Author: Javier Oliver
  */
 
+
 	#include "ledMatrix_16x8.h"
 	#include "gpio.h"
 	#include "game.h"
 
 	/* variables */
-	const screenMatrix test  = {
+	screenMatrix test  = {
 			/*     (0,0) X ——►
 			 *      Y
 			 *      |
@@ -20,22 +21,22 @@
 			 *      ..
 			 *    				(15,7)
 			 * */
-					{1,1,1,1,0,0,0,0},
-					{1,1,1,1,0,0,0,0},
-					{0,1,1,0,0,0,0,0},
-					{0,1,1,0,1,1,1,1},
-					{0,1,1,0,1,0,0,0},
-					{0,0,0,0,1,1,1,0},
-					{0,0,0,0,1,0,0,0},
-					{0,0,0,0,1,1,1,1},
-					{0,1,1,1,0,0,0,0},
-					{1,0,0,0,0,0,0,0},
-					{0,1,0,0,0,0,0,0},
-					{0,0,1,0,1,1,1,1},
-					{0,0,0,1,1,1,1,1},
-					{1,1,1,0,0,1,1,0},
-					{0,0,0,0,0,1,1,0},
-					{0,0,0,0,0,1,1,0}
+					{1,0,0,0,0,0,0,1},
+					{1,1,1,0,1,1,1,0},
+					{0,1,0,0,1,0,0,0},
+					{0,1,0,0,1,1,1,0},
+					{0,1,0,0,1,0,0,0},
+					{0,1,0,0,1,1,1,0},
+					{0,0,0,0,0,0,0,0},
+					{1,1,1,1,1,1,1,1},/**/
+					{1,1,1,1,1,1,1,1},/**/
+					{0,0,0,0,0,0,0,0},
+					{1,1,1,0,1,1,1,0},
+					{1,0,0,0,0,1,0,0},
+					{1,1,1,0,0,1,0,0},
+					{0,0,1,0,0,1,0,0},
+					{1,1,1,0,0,1,0,0},
+					{1,0,0,0,0,0,0,1},
 				   };
 
     /* Refreshes the screen*/
@@ -73,7 +74,7 @@
 
 	/* draws a single line when the common cathode is selected */
     void MATRIX_drawY(screenMatrix matrix, uint8_t cathode){
-
+    	int i;
     	/* Resets all common cathodes. They are shorted 1 to 1 in both Matrixes */
     	MATRIX_resetX();
 
@@ -97,6 +98,9 @@
 
 		/* Select the next common X (cathode)*/
 		MATRIX_selectX(cathode);
+
+
+
 
     }
 
@@ -124,3 +128,7 @@
     		return GPIO_PIN_RESET;
     	}
     }
+
+
+
+
