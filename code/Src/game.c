@@ -19,27 +19,54 @@
 	uint8_t sleepCountDown;
 
 	/* This variable will hold the current screen status to show */
-	screenMatrix gameMatrix = {{0}};
+	static screenMatrix gameMatrix = {{0}};
 
 	/* constants */
+	screenMatrix gameIdle = {
+							/*     (0,0) X ——►
+							 *      Y
+							 *      |
+							 *      ▼
+							 *      ..
+							 *      ..
+							 *      ..
+							 *    				(15,7)
+							 * */
+									{0,0,0,0,0,0,0,0},
+									{1,1,1,0,1,1,0,0},
+									{0,1,0,0,1,0,1,0},
+									{0,1,0,0,1,0,1,0},
+									{0,1,0,0,1,0,1,0},
+									{1,1,1,0,1,1,0,0},
+									{0,0,0,0,0,0,0,0},
+									{0,0,0,0,0,0,0,0},
+									{0,0,0,0,0,0,0,0},
+									{1,0,0,0,1,1,1,0},
+									{1,0,0,0,1,0,0,0},
+									{1,0,0,0,1,1,1,0},
+									{1,0,0,0,1,0,0,0},
+									{1,1,1,0,1,1,1,0},
+									{0,0,0,0,0,0,0,0},
+									{0,0,0,0,0,0,0,0}
+								   };
 
-	const screenMatrix gameOver = {
-									{0,0,1,1,1,1,0,0},
-								    {0,1,1,0,0,1,1,0},
-								    {1,1,0,0,0,0,1,1},
-								    {1,0,0,0,0,0,0,1},
-								    {1,0,0,0,0,0,0,1},
-								    {1,1,0,0,0,0,1,1},
-								    {0,1,1,0,0,1,1,0},
-								    {0,0,1,1,1,1,0,0},
-									{0,0,1,1,1,1,0,0},
-								    {0,1,1,0,0,1,1,0},
-								    {1,1,0,0,0,0,1,1},
-								    {1,0,0,0,0,0,0,1},
-								    {1,0,0,0,0,0,0,1},
-								    {1,1,0,0,0,0,1,1},
-								    {0,1,1,0,0,1,1,0},
-								    {0,0,1,1,1,1,0,0}
+	screenMatrix gameOver = {
+									{0,0,0,0,0,0,0,0},
+									{0,0,0,0,0,0,0,0},
+									{0,0,0,0,0,0,0,0},
+									{0,0,0,0,0,0,0,0},
+									{0,0,0,0,0,0,0,0},
+									{0,0,0,0,0,0,0,0},
+									{0,0,0,0,0,0,0,0},
+									{0,0,0,0,0,0,0,0},
+									{0,0,0,0,0,0,0,0},
+									{0,0,0,0,0,0,0,0},
+									{0,0,0,0,0,0,0,0},
+									{0,0,0,0,0,0,0,0},
+									{0,0,0,0,0,0,0,0},
+									{0,0,0,0,0,0,0,0},
+									{0,0,0,0,0,0,0,0},
+									{0,0,0,0,0,0,0,0}
 								   };
 
 
@@ -64,19 +91,32 @@
 
 	}
 
+	/* This function will check if a complete line has been filled.
+	 * If a row is completed, it will return the line else -1*/
+	int GAME_fullRow(screenMatrix currentMatrix){
+		int row = -1;
+
+		return row;
+	}
+
+	/* this function will remove the row when completed.*/
+	void GAME_removeRow(int row){
+
+	}
+
 	/* Show lines killed after GAME OVER */
 	void GAME_showResults(){
 
 	}
 
-	/* Show GAME OVER screen */
-	void GAME_showGameOver(){
+	/* Dumps the screenToCopy variable into the screen variable */
+	void GAME_copyScreen(screenMatrix screenToCopy){
 		uint8_t i;
 		uint8_t j;
 
 		/* Copy the gameOver screen to the current matrix */
 		for(i = 0; i < ROW; i++){
-			for (j = 0; j < COLUMN; j++)gameMatrix[i][j] = gameOver[i][j];
+			for (j = 0; j < COLUMN; j++)gameMatrix[i][j] = screenToCopy[i][j];
 		}
 
 	}
@@ -88,12 +128,12 @@
 
 	/* Game configuration */
 	void GAME_Config(void){
-
+		GAME_copyScreen(gameIdle);
 	}
 
 	/* Refreshes the screen */
 	void GAME_refreshScreenTask_20ms(void){
-		MATRIX_testScreen();
+		MATRIX_refreshMatrix(gameMatrix);
 	}
 
 	/* Move down block task*/

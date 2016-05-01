@@ -9,16 +9,18 @@
 	#include "osd.h"
 	#include "stm32f1xx_hal.h"
 	#include "game.h"
+	#include "ledMatrix_16x8.h"
 
 
 
 /* ################## Defines ######################### */
 	#define value1000ms	((1000u / OSD_SYSTEM_TICK_ms)-1u)
-	#define value500ms	((500u / OSD_SYSTEM_TICK_ms)-1u)
-	#define value200ms	((200u / OSD_SYSTEM_TICK_ms)-1u)
-	#define value100ms	((100u / OSD_SYSTEM_TICK_ms)-1u)
-	#define value40ms	((40u / OSD_SYSTEM_TICK_ms)-1u)
-	#define value20ms	((20u / OSD_SYSTEM_TICK_ms)-1u)
+	#define value500ms	((500u  / OSD_SYSTEM_TICK_ms)-1u)
+	#define value200ms	((200u  / OSD_SYSTEM_TICK_ms)-1u)
+	#define value100ms	((100u  / OSD_SYSTEM_TICK_ms)-1u)
+	#define value40ms	((40u   / OSD_SYSTEM_TICK_ms)-1u)
+	#define value20ms	((20u   / OSD_SYSTEM_TICK_ms)-1u)
+	#define value2ms	((2u    / OSD_SYSTEM_TICK_ms)-1u)
 
 /* ################## Global variables ################## */
 	#ifdef USE_BASIC_OSD
@@ -50,7 +52,7 @@
 			}
 
 			/* ************** */
-			if (OSD_counters.U8_until_200ms < value200ms) {
+			if (OSD_counters.U8_until_200ms < (uint8_t)value200ms) {
 				OSD_counters.U8_until_200ms++;
 			}
 			else {
@@ -58,7 +60,7 @@
 				/* 200ms tasks */
 			}
 			/* ************** */
-			if (OSD_counters.U8_until_100ms < value100ms) {
+			if (OSD_counters.U8_until_100ms < (uint8_t)value100ms) {
 				OSD_counters.U8_until_100ms++;
 			}
 			else {
@@ -67,7 +69,7 @@
 			}
 
 			/* ************** */
-			if (OSD_counters.U8_until_40ms < value40ms) {
+			if (OSD_counters.U8_until_40ms < (uint8_t)value40ms) {
 				OSD_counters.U8_until_40ms++;
 			}
 			else {
@@ -75,7 +77,7 @@
 				/* 40ms tasks */
 			}
 			/* ************** */
-			if (OSD_counters.U8_until_20ms < value20ms) {
+			if (OSD_counters.U8_until_20ms < (uint8_t)value20ms) {
 				OSD_counters.U8_until_20ms++;
 			}
 			else {
@@ -83,6 +85,18 @@
 				/* 20ms tasks */
 				GAME_refreshScreenTask_20ms();
 			}
+			/* ************** */
+			if (OSD_counters.U8_until_2ms < (uint8_t)value2ms) {
+				OSD_counters.U8_until_2ms++;
+			}
+			else {
+				OSD_counters.U8_until_2ms = 0u;
+				/* 2ms tasks */
+				MATRIX_refreshColumn_task2ms();
+
+			}
+
+
 		}
 
 		/* System Clock Configuration */

@@ -41,8 +41,15 @@
 	/* Show lines killed after GAME OVER */
 	void GAME_showResults();
 
-	/* Show GAME OVER screen */
-	void GAME_showGameOver();
+	/* This function will check if a complete line has been filled.
+	 * If a row is completed, it will return the line else -1*/
+	int GAME_fullRow(screenMatrix currentMatrix);
+
+	/* this function will remove the row when completed.*/
+	void GAME_removeRow(int row);
+
+	/* Dumps the screenToCopy variable into the screen variable */
+	void GAME_copyScreen(screenMatrix screenToCopy);
 
 	/* Refreshes the screen */
 	void GAME_refreshScreenTask_20ms(void);
