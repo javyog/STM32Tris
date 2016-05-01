@@ -26,9 +26,6 @@
     /* de-selects all X (columns)*/
     void MATRIX_resetX(void);
 
-    /* This function will control the time ON of each column*/
-    void MATRIX_refreshColumn_task2ms(screenMatrix matrix);
-
     /* This function will transform the values at the current matrix to PIN states (SET / RESET)*/
     GPIO_PinState MATRIX_ledValue(uint8_t value);
 

@@ -25,8 +25,7 @@
                 uint8_t  U8_until_200ms;
                 uint8_t  U8_until_100ms;
                 uint8_t  U8_until_40ms;
-                uint8_t  U8_until_20ms;
-                uint8_t  U8_until_2ms;
+                uint8_t  U8_until_5ms;
             }T_OSD_counters;
         #endif
     #endif

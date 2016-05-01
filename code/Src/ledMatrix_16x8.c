@@ -13,7 +13,6 @@
     /* Refreshes the screen*/
 	void MATRIX_refreshMatrix(screenMatrix matrix){
 		uint8_t cathode;
-
 		/* We will refresh from columns from 0 to 7*/
 		for(cathode = 0; cathode < COLUMN; cathode++){
 			MATRIX_drawY(matrix, cathode);
@@ -21,9 +20,6 @@
 		MATRIX_resetX();
 	}
 
-	MATRIX_refreshColumn_task2ms(screenMatrix matrix){
-
-	}
 
 	/* Aux function to select the common cathode pin  */
 	void MATRIX_selectX(uint8_t cathode){

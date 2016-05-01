@@ -132,7 +132,7 @@
 	}
 
 	/* Refreshes the screen */
-	void GAME_refreshScreenTask_20ms(void){
+	void GAME_refreshScreenTask_5ms(void){
 		MATRIX_refreshMatrix(gameMatrix);
 	}
 

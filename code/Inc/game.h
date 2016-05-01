@@ -52,7 +52,7 @@
 	void GAME_copyScreen(screenMatrix screenToCopy);
 
 	/* Refreshes the screen */
-	void GAME_refreshScreenTask_20ms(void);
+	void GAME_refreshScreenTask_5ms(void);
 
 	/* Save the score to the flash for having a ranking*/
 	void GAME_saveScore(uint32_t lines);
