@@ -9,17 +9,20 @@
 	#include "game.h"
 	#include "ledMatrix_16x8.h"
 
-	/* Variables */
-
-	/*variables*/
-	/* number of lines killed. If top ten score, we will save it*/
+	/*##### Variables #####*/
+	/* Number of lines killed. If top ten score, we will save it*/
 	uint32_t numLines;
 
-	/* counter to check if we are idle and we should go to sleep */
-	uint8_t sleepCountDown;
+	/* Counter to check if we are idle and we should go to sleep
+	 * It will be refreshed inside the game engine if we press a button*/
+	uint8_t sleepCountDown = COUNT_DOWN;
 
-	/* This variable will hold the current screen status to show */
+	/* This variable will hold the current screen status to show in the led matrix*/
 	static screenMatrix gameMatrix = {{0}};
+
+
+
+	/*##### Variables ENDS #####*/
 
 	/* constants */
 	screenMatrix gameIdle = {
@@ -131,17 +134,32 @@
 		GAME_copyScreen(gameIdle);
 	}
 
-	/* Refreshes the screen */
+	/* Refreshes the screen. It is independent of the GAME engine to increase the refresh rate */
 	void GAME_refreshScreenTask_5ms(void){
 		MATRIX_refreshMatrix(gameMatrix);
 	}
 
-	/* Move down block task*/
-	void GAME_BlockDownTask_1000ms(void){
-		//HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_1);
+	uint8_t GAME_buttonsPressed(void){
+		uint8_t buttons = 0;
+		/* The buttons have pull-ups, inverting the logic */
+		buttons |= (0x8 & (HAL_GPIO_ReadPin(BUTTON_UP_GPIO_Port, BUTTON_UP_Pin)      << 3));
+		buttons |= (0x4 & (HAL_GPIO_ReadPin(BUTTON_DOWN_GPIO_Port, BUTTON_DOWN_Pin)  << 2));
+		buttons |= (0x2 & (HAL_GPIO_ReadPin(BUTTON_LEFT_GPIO_Port, BUTTON_LEFT_Pin)  << 1));
+		buttons |= (0x1 & (HAL_GPIO_ReadPin(BUTTON_RIGHT_GPIO_Port, BUTTON_RIGHT_Pin)));
 
+		return buttons;
 	}
 
+	/* This is the main game task where we will move, rotate, call sounds and control the whole game*/
+	void GAME_EngineTask_20ms(void){
+		uint8_t buttons;
+
+		buttons = GAME_buttonsPressed();
+
+		if(buttons){
+			HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
+		}else HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
+	}
 
 
 

@@ -18,7 +18,7 @@
 	#define value500ms	((500u  / OSD_SYSTEM_TICK_ms)-1u)
 	#define value200ms	((200u  / OSD_SYSTEM_TICK_ms)-1u)
 	#define value100ms	((100u  / OSD_SYSTEM_TICK_ms)-1u)
-	#define value40ms	((40u   / OSD_SYSTEM_TICK_ms)-1u)
+	#define value20ms	((20u   / OSD_SYSTEM_TICK_ms)-1u)
 	#define value5ms	((2u    / OSD_SYSTEM_TICK_ms)-1u)
 
 /* ################## Global variables ################## */
@@ -37,9 +37,6 @@
 			else {
 				OSD_counters.U16_until_1000ms = 0u;
 				/* 1s tasks */
-				/* Move block down task*/
-				GAME_BlockDownTask_1000ms();
-
 
 			}
 			if (OSD_counters.U16_until_500ms < (uint16_t)value500ms) {
@@ -68,12 +65,13 @@
 			}
 
 			/* ************** */
-			if (OSD_counters.U8_until_40ms < (uint8_t)value40ms) {
-				OSD_counters.U8_until_40ms++;
+			if (OSD_counters.U8_until_20ms < (uint8_t)value20ms) {
+				OSD_counters.U8_until_20ms++;
 			}
 			else {
-				OSD_counters.U8_until_40ms = 0u;
-				/* 40ms tasks */
+				OSD_counters.U8_until_20ms = 0u;
+				/* 20ms tasks */
+				GAME_EngineTask_20ms();
 			}
 
 			/* ************** */

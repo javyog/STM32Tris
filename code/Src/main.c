@@ -22,7 +22,7 @@
 		/* Configure system clock tick for the scheduler*/
 		SystemClock_Config();
 
-		/* Configure the game and */
+		/* Configure the game */
 		GAME_Config();
 
 		/* Initialize all configured peripherals */

@@ -8,8 +8,15 @@
 	#ifndef INC_GAME_H_
 	#define INC_GAME_H_
 
-	#define COLUMN	8
-	#define ROW 	16
+	#define COLUMN		8
+	#define ROW 		16
+	#define COUNT_DOWN 	5
+
+	/*Buttons -> nibble 1, 1, 1, 1*/
+	#define RIGHT		1
+	#define LEFT		2
+	#define DOWN		4
+	#define UP			8
 
 	/* includes */
 	#include <stdint.h>
@@ -17,13 +24,14 @@
 	/* typedefs */
 	typedef uint8_t screenMatrix[16][8];
 
-
 	/* Functions */
 	/* Game configuration */
 	void GAME_Config(void);
 
-	/* Task to move down the current block*/
-	void GAME_BlockDownTask_1000ms(void);
+	/* This is the main game task where we will move, rotate, call sounds and control the whole game*/
+	void GAME_EngineTask_20ms(void);
+
+	uint8_t GAME_buttonsPressed(void);
 
 	/* Every second we will decrement the sleeCountDown. If we reach 0 we will go to sleep to save battery
 	 * With every button interrupt we have to refresh the counter*/
@@ -51,10 +59,12 @@
 	/* Dumps the screenToCopy variable into the screen variable */
 	void GAME_copyScreen(screenMatrix screenToCopy);
 
-	/* Refreshes the screen */
+	/* Refreshes the screen at 200hz. Absolute minimum 50hz otherwise blinking noticiable. */
 	void GAME_refreshScreenTask_5ms(void);
 
-	/* Save the score to the flash for having a ranking*/
+	/* Save the score to the flash for having a ranking.
+	 * We could show it after the game over screen
+	 * */
 	void GAME_saveScore(uint32_t lines);
 
 	#endif /* INC_GAME_H_ */
