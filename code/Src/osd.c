@@ -7,9 +7,7 @@
 
 	/* prototypes */
 	#include "osd.h"
-	#include "stm32f1xx_hal.h"
-	#include "game.h"
-	#include "ledMatrix_16x8.h"
+
 
 
 
@@ -81,7 +79,7 @@
 			else {
 				OSD_counters.U8_until_5ms = 0u;
 				/* 2ms tasks */
-				GAME_refreshScreenTask_5ms();
+				MATRIX_refreshScreenTask_5ms();
 			}
 
 

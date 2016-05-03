@@ -8,9 +8,10 @@
 
 
 /* Include external APIs */
-	#include <osd.h>
 	#include "stm32f1xx_hal.h"
 	#include "gpio.h"
+	#include "rtc.h"
+	#include "osd.h"
 	#include "game.h"
 
 	int main(void)

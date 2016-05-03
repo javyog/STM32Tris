@@ -10,8 +10,14 @@
 	#include "gpio.h"
 	#include "game.h"
 
+
+	/* Refreshes the screen at 200hz */
+	void MATRIX_refreshScreenTask_5ms(void){
+		MATRIX_refreshMatrix(currentMatrix);
+	}
+
     /* Refreshes the screen*/
-	void MATRIX_refreshMatrix(screenMatrix matrix){
+	void MATRIX_refreshMatrix(TScreenMatrix matrix){
 		uint8_t cathode;
 		/* We will refresh from columns from 0 to 7*/
 		for(cathode = 0; cathode < COLUMN; cathode++){
@@ -20,6 +26,18 @@
 		MATRIX_resetX();
 	}
 
+
+	/* This is the entry point. The game engine will call this function to update the internal
+	 * matrix variable. Then the updated variable will be called in the refresh screen task*/
+    void MATRIX_matrixVariableUpdate(TScreenMatrix matrix){
+		uint8_t i;
+		uint8_t j;
+
+		/* Copy the matrix intro the matrix variable screen to the current matrix */
+		for(i = 0; i < ROW; i++){
+			for (j = 0; j < COLUMN; j++)currentMatrix[i][j] = matrix[i][j];
+		}
+	}
 
 	/* Aux function to select the common cathode pin  */
 	void MATRIX_selectX(uint8_t cathode){
@@ -44,7 +62,7 @@
 	}
 
 	/* draws a single line when the common cathode is selected */
-    void MATRIX_drawY(screenMatrix matrix, uint8_t cathode){
+    void MATRIX_drawY(TScreenMatrix matrix, uint8_t cathode){
     	/* Resets all common cathodes. They are shorted 1 to 1 in both Matrixes */
     	MATRIX_resetX();
 
@@ -83,7 +101,8 @@
 		HAL_GPIO_WritePin(MATRIX_X7_GPIO_Port, MATRIX_X7_Pin, GPIO_PIN_SET);
     }
 
-    /* Custom converts from uint8_t values to GPIO_PinState (enum)*/
+
+	/* Custom converts from uint8_t values to GPIO_PinState (enum)*/
     GPIO_PinState MATRIX_ledValue(uint8_t value){
     	if (value == 1){
     		return GPIO_PIN_SET;
@@ -91,7 +110,3 @@
     		return GPIO_PIN_RESET;
     	}
     }
-
-
-
-

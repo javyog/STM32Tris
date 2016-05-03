@@ -9,7 +9,9 @@
 
 
     #include <stdint.h>
-
+	#include "stm32f1xx_hal.h"
+	#include "game.h"
+	#include "ledMatrix_16x8.h"
 
     /* Defines */
 
