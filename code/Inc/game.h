@@ -11,9 +11,14 @@
 	#include "stm32f1xx_hal.h"
 	#include "ledMatrix_16x8.h"
 
+    /* Matrix rows and columns*/
 	#define COLUMN		8
 	#define ROW 		16
+    /* Count down define before going to sleep*/
 	#define COUNT_DOWN 	5
+
+	/* This is the time to see a long press and repeat the buttons pressed*/
+	#define LONG_PRESS_MS 400
 
 	/*Buttons -> nibble 1, 1, 1, 1*/
 	#define RIGHT		0x1
