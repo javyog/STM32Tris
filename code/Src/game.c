@@ -143,104 +143,161 @@
 		GAME_copyScreen(gameIdle);
 	}
 
-	uint8_t GAME_buttonsPressed(void){
+	/* nextMove will decide what next move is going to be done by checking the input buttons
+	 * We will differentiate between first time we press the button, long press and repetitions after long press detected
+	 * The logic will be:
+	 * if down pressed, it doesn't matter the others
+	 * if not if up(rotate pressed, it doesn't matter left or right)
+	 * if left or right are not pressed at the same time, the move is left of right otherwise nothing*/
+	uint8_t GAME_nextMove(void){
+		/*##### Variables #####*/
+		/* next move variable */
 		uint8_t move = 0;
 
-		/*This variables will be used to see if we have a long press so we move/rotate every X*/
+		/* This variables will be used to see if we have a long press so we move/rotate every X ms */
 		static uint32_t timeNow = 0;
 		static uint32_t timePrev_LEFT = 0;
 		static uint32_t timePrev_RIGHT = 0;
 		static uint32_t timePrev_UP = 0;
 		static uint32_t timePrev_DOWN = 0;
+		/* Time variables to wait until repeat */
+		static uint16_t repeat_LEFT = LONG_PRESS_MS;
+		static uint16_t repeat_RIGHT = LONG_PRESS_MS;
+		static uint16_t repeat_UP = LONG_PRESS_MS;
+		static uint16_t repeat_DOWN = LONG_PRESS_MS;
 
+		/* We need to see if it is the first time we press the button. In this way we can detect a long press
+		 * slower and then the re-iterations will be faster */
 		static uint8_t firstLeft  = 1;
 		static uint8_t firstRight = 1;
 		static uint8_t firstUp	  = 1;
 		static uint8_t firstDown  = 1;
+		/* These variables will hold the current button status
+		 * */
+		static GPIO_PinState left;
+		static GPIO_PinState right;
+		static GPIO_PinState up;
+		static GPIO_PinState down;
 
+
+		/*##### Function logic #####*/
+
+		/* Retrieving data */
 		timeNow = HAL_GetTick();
+		left 	= HAL_GPIO_ReadPin(BUTTON_LEFT_GPIO_Port, BUTTON_LEFT_Pin);
+		right 	= HAL_GPIO_ReadPin(BUTTON_RIGHT_GPIO_Port, BUTTON_RIGHT_Pin);
+		up 		= HAL_GPIO_ReadPin(BUTTON_UP_GPIO_Port, BUTTON_UP_Pin);
+		down 	= HAL_GPIO_ReadPin(BUTTON_DOWN_GPIO_Port, BUTTON_DOWN_Pin);
 
-		/* Move right, it will have first press and long presses */
-		if (HAL_GPIO_ReadPin(BUTTON_RIGHT_GPIO_Port, BUTTON_RIGHT_Pin) == GPIO_PIN_SET){
-			timePrev_RIGHT = timeNow;
-			if(firstRight == 0)firstRight = 1;
-		}else{
-			if(firstRight == 1){
-				firstRight = 0;
-				move |= (RIGHT & (~(HAL_GPIO_ReadPin(BUTTON_RIGHT_GPIO_Port, BUTTON_RIGHT_Pin))));
-			}else{
-				if((timeNow - timePrev_RIGHT) > LONG_PRESS_MS){
-					move |= (RIGHT & (~(HAL_GPIO_ReadPin(BUTTON_RIGHT_GPIO_Port, BUTTON_RIGHT_Pin))));
-					timePrev_RIGHT = timeNow;
-				}
-			}
-		}
 
-		/* Move left, it will have first press and long presses */
-		if (HAL_GPIO_ReadPin(BUTTON_LEFT_GPIO_Port, BUTTON_LEFT_Pin) == GPIO_PIN_SET){
-			timePrev_LEFT = timeNow;
-			if(firstLeft == 0)firstLeft = 1;
-		}else{
-			if(firstLeft == 1){
-				firstLeft = 0;
-				move |= (LEFT  & (~(HAL_GPIO_ReadPin(BUTTON_LEFT_GPIO_Port, BUTTON_LEFT_Pin)  << 1)));
-			}else{
-				if((timeNow - timePrev_LEFT) > LONG_PRESS_MS){
-					move |= (LEFT & (~(HAL_GPIO_ReadPin(BUTTON_LEFT_GPIO_Port, BUTTON_LEFT_Pin)  << 1)));
-					timePrev_LEFT = timeNow;
-				}
-			}
-		}
 
-		if (HAL_GPIO_ReadPin(BUTTON_UP_GPIO_Port, BUTTON_UP_Pin) == GPIO_PIN_SET){
-			timePrev_UP = timeNow;
-			if(firstUp == 0)firstUp = 1;
-		}else{
-			if(firstUp == 1){
-				firstUp = 0;
-				move |= (UP    & (~(HAL_GPIO_ReadPin(BUTTON_UP_GPIO_Port, BUTTON_UP_Pin)      << 3)));
-			}else{
-				if((timeNow - timePrev_UP) > LONG_PRESS_MS){
-					move |= (UP & (~(HAL_GPIO_ReadPin(BUTTON_UP_GPIO_Port, BUTTON_UP_Pin)      << 3)));
-					timePrev_UP = timeNow;
-				}
-			}
-		}
 
-		if (HAL_GPIO_ReadPin(BUTTON_DOWN_GPIO_Port, BUTTON_DOWN_Pin) == GPIO_PIN_SET){
+		if (down == GPIO_PIN_SET){
 			timePrev_DOWN = timeNow;
-			if(firstDown == 0)firstDown = 1;
+			if(firstDown == 0){
+				firstDown = 1;
+				repeat_DOWN = LONG_PRESS_MS;
+			}
 		}else{
 			if(firstDown == 1){
 				firstDown = 0;
-				move |= (DOWN  & (~(HAL_GPIO_ReadPin(BUTTON_DOWN_GPIO_Port, BUTTON_DOWN_Pin)  << 2)));
+				move |= (DOWN  & (~down << 2));
 			}else{
-				if((timeNow - timePrev_DOWN) > LONG_PRESS_MS){
-					move |= (DOWN  & (~(HAL_GPIO_ReadPin(BUTTON_DOWN_GPIO_Port, BUTTON_DOWN_Pin)  << 2)));
+				if((timeNow - timePrev_DOWN) > repeat_DOWN){
+					/* Long press */
+					move |= (DOWN  & (~down << 2));
 					timePrev_DOWN = timeNow;
+					repeat_DOWN = REPEAT_PRESS_MS;
 				}
 			}
+
+			/* If down is press we will ignore other buttons*/
+			return move;
 		}
 
-		/* The buttons have pull-ups, inverting the logic */
-		/*
-		buttons |= (UP    & (~(HAL_GPIO_ReadPin(BUTTON_UP_GPIO_Port, BUTTON_UP_Pin)      << 3)));
-		buttons |= (DOWN  & (~(HAL_GPIO_ReadPin(BUTTON_DOWN_GPIO_Port, BUTTON_DOWN_Pin)  << 2)));
-		buttons |= (LEFT  & (~(HAL_GPIO_ReadPin(BUTTON_LEFT_GPIO_Port, BUTTON_LEFT_Pin)  << 1)));
-		buttons |= (RIGHT & (~(HAL_GPIO_ReadPin(BUTTON_RIGHT_GPIO_Port, BUTTON_RIGHT_Pin)))); */
+		if (up == GPIO_PIN_SET){
+			timePrev_UP = timeNow;
+			if(firstUp == 0){
+				firstUp = 1;
+				repeat_UP = LONG_PRESS_MS;
+			}
+		}else{
+			if(firstUp == 1){
+				firstUp = 0;
+				move |= (UP & (~up << 3));
+			}else{
+				if((timeNow - timePrev_UP) > repeat_UP){
+					move |= (UP & (~up << 3));
+					timePrev_UP = timeNow;
+					repeat_UP = REPEAT_PRESS_MS;
+				}
+			}
 
+			/* If rotate is pressed ignoring left and right */
+			return move;
+		}
+
+		/* Move right, it will have first press and long presses */
+		if (right == GPIO_PIN_SET){
+			timePrev_RIGHT = timeNow;
+			if(firstRight == 0){
+				firstRight = 1;
+				repeat_RIGHT = LONG_PRESS_MS;
+			}
+		}else{
+			if( left != right ){
+				if(firstRight == 1){
+					firstRight = 0;
+					move |= (RIGHT & (~right));
+				}else{
+					if((timeNow - timePrev_RIGHT) > repeat_RIGHT){
+						move |= (RIGHT & (~right));
+						timePrev_RIGHT = timeNow;
+						repeat_RIGHT = REPEAT_PRESS_MS;
+					}
+				}
+			}else return 0;
+		}
+
+		/* Move left, it will have first press and long presses */
+		if (left == GPIO_PIN_SET){
+			timePrev_LEFT = timeNow;
+			if(firstLeft == 0){
+				firstLeft = 1;
+				repeat_LEFT = LONG_PRESS_MS;
+			}
+		}else{
+			if( left != right ){
+				if(firstLeft == 1){
+					firstLeft = 0;
+					move |= (LEFT & (~left << 1));
+				}else{
+					if((timeNow - timePrev_LEFT) > repeat_LEFT){
+						move |= (LEFT & (~left << 1));
+						timePrev_LEFT = timeNow;
+						repeat_LEFT = REPEAT_PRESS_MS;
+
+					}
+				}
+			}else return 0;
+		}
 
 		/* if every button is pressed or repeating buttons = 0x15   0x8 | 0x4 | 0x2 | 0x1 */
 
 		return move;
 	}
 
+
+
 	/* This is the main game task where we will move, rotate, call sounds and control the whole game*/
 	void GAME_EngineTask_20ms(void){
+		/*##### Variables #####*/
 		uint8_t buttons;
 		static uint32_t timeNow = 0;
 		static uint32_t timePrev = 0;
 
+
+		/*##### Function logic #####*/
 		/* After 1000 ms time to move the block down */
 		timeNow = HAL_GetTick();
 
@@ -249,8 +306,8 @@
 			timeNow = timePrev;
 		}
 
-		/*## BUTTON CONTROL SECTION ##*/
-		buttons = GAME_buttonsPressed();
+		/*## MOVEMENT CONTROL SECTION ##*/
+		buttons = GAME_nextMove();
 
 		/* If left and right pressed at the same time, don't move (Lighting led pin)*/
 		switch (buttons){

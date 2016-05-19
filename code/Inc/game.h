@@ -18,7 +18,11 @@
 	#define COUNT_DOWN 	5
 
 	/* This is the time to see a long press and repeat the buttons pressed*/
-	#define LONG_PRESS_MS 400
+	#define LONG_PRESS_MS 1000
+
+	/* after long press is detected, this will be the time to repeat the button action*/
+	#define REPEAT_PRESS_MS 300
+
 
 	/*Buttons -> nibble 1, 1, 1, 1*/
 	#define RIGHT		0x1
@@ -36,7 +40,8 @@
 	/* This is the main game task where we will move, rotate, call sounds and control the whole game*/
 	void GAME_EngineTask_20ms(void);
 
-	uint8_t GAME_buttonsPressed(void);
+	/* nextMove will decide what next move is going to be done by checking the input buttons */
+	uint8_t GAME_nextMove(void);
 
 	/* Every second we will decrement the sleeCountDown. If we reach 0 we will go to sleep to save battery
 	 * With every button interrupt we have to refresh the counter*/

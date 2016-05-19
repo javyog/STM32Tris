@@ -106,7 +106,7 @@
 		  HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0);
 
 		  //HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq()/1000);
-		  /* Configuring Sys tick to 5ms */
+		  /* Configuring Sys tick to 1ms */
 		  HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq()/(1000 / OSD_SYSTEM_TICK_ms));
 
 		  HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);
