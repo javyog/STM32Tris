@@ -4,8 +4,19 @@
  *  Created on: Apr 24, 2016
  *      Author: Javier Oliver
  */
+
+    /*
+     * ToDO:  * Add state machine. Playing - Game Over - Result Screen
+     * 		  * Add sound
+     * 		  * Change block creation method. Atm I create another blank screen array which has the block and I have to iterate
+     * 		 	every time the user press a button. I add the block array to a pile array and then display.
+     * 		 	I could have a type block with coordinate to speed up the thing
+     * 		  * Add a true random generator. The sequence is always the same as it is now by using rand()
+     * */
+
 	/* Includes */
 	#include "game.h"
+
 
 
 	/*##### Variables #####*/
@@ -16,8 +27,18 @@
 	 * It will be refreshed inside the game engine if we press a button*/
 	uint8_t sleepCountDown = COUNT_DOWN;
 
+	/* Boolean values to indicate whether there is a block or not */
+	int blockExists = 0;
+
+
+
+	/* After thinking how to represent the block,
+	 * i thought to have a matrix with 4 dots in it and the OR function to display */
+	TScreenMatrix blockMatrix = {{0}};
+	/* This variable will the blocks that are not moving */
+	TScreenMatrix pileMatrix = {{0}};
 	/* This variable will hold the current screen status to show in the led matrix*/
-	static TScreenMatrix gameMatrix = {{0}};
+	TScreenMatrix displayMatrix = {{0}};
 
 
 
@@ -52,7 +73,7 @@
 									{0,0,0,0,0,0,0,0}
 								   };
 
-	TScreenMatrix gameOver = {
+	TScreenMatrix gameBlank = {
 									{0,0,0,0,0,0,0,0},
 									{0,0,0,0,0,0,0,0},
 									{0,0,0,0,0,0,0,0},
@@ -83,36 +104,197 @@
 
 	}
 
-	/* Function to move a block left -- eg. (*gameMatrix)[1][0] = 7;*/
+	/* Function to move a block left -- eg. (*displayMatrix)[1][0] = 7;*/
 	void GAME_moveLeft(){
 
+		/* Variable to hold the updated block. It will be used to detect collisions*/
+		TScreenMatrix movedBlock = {{0}};
+		int row;
+		int column;
+		uint8_t stop = 0;
+
+
+		/* From right to left */
+		for (row = (ROW - 1); (row >= 0) && (stop == 0); row--){
+			for (column = 0; column <= (COLUMN - 1); column++){
+				if (blockMatrix[row][column] == 1){
+					/* If we are in the most right */
+					if(column == 0) stop = 1;
+					/* Below we have an obstacle*/
+					if(column > 0){
+						if(pileMatrix[row][column - 1] == 1)stop = 1;
+					}
+					movedBlock[row][column] = 0;
+					movedBlock[row][column - 1] = 1;
+				}
+			}
+		}
+
+		/* After checking the block against the display matrix we take actions*/
+		if (stop == 0){
+
+			for(row = 0; row < ROW; row++){
+				/* Updating the current block */
+				for (column = 0; column < COLUMN; column++) {
+					blockMatrix[row][column] = movedBlock[row][column];
+					displayMatrix[row][column] = (pileMatrix[row][column] | blockMatrix[row][column]);
+				}
+			}
+
+		}else
+		{
+			/* If we reach this means that we have an obstacle and thus we should not move the block */
+		}
+
 	}
+
 
 	/* Function to move a block right */
 	void GAME_moveRight(){
+		/* Variable to hold the updated block. It will be used to detect collisions*/
+		TScreenMatrix movedBlock = {{0}};
+		int row;
+		int column;
+		uint8_t stop = 0;
+
+
+		/* From right to left */
+		for (row = (ROW - 1); (row >= 0) && (stop == 0); row--){
+			for (column = (COLUMN - 1); column >= 0; column--){
+				if (blockMatrix[row][column] == 1){
+					/* If we are in the most right */
+					if(column == (COLUMN - 1)) stop = 1;
+					/* Below we have an obstacle*/
+					if(column < (COLUMN - 1)){
+						if(pileMatrix[row][column + 1] == 1)stop = 1;
+					}
+					movedBlock[row][column] = 0;
+					movedBlock[row][column + 1] = 1;
+				}
+			}
+		}
+
+		/* After checking the block against the display matrix we take actions*/
+		if (stop == 0){
+
+			for(row = 0; row < ROW; row++){
+				/* Updating the current block */
+				for (column = 0; column < COLUMN; column++) {
+					blockMatrix[row][column] = movedBlock[row][column];
+					displayMatrix[row][column] = (pileMatrix[row][column] | blockMatrix[row][column]);
+				}
+			}
+
+		}else
+		{
+			/* If we reach this means that we have an obstacle and thus we should not move the block */
+		}
 
 	}
 
-	/* Function to move a block to the bottom */
-	void GAME_moveToBottom(){
 
+
+
+	/* Function to move a block to the bottom until down is not pressed */
+	void GAME_moveToBottom(){
+		GAME_moveDown();
 	}
 
 	/* Function to move the block 1 row down*/
 	void GAME_moveDown(){
+		/* Variable to hold the updated block. It will be used to detect collisions*/
+		TScreenMatrix movedBlock = {{0}};
+		int row;
+		int column;
+		int stop = 0;
+
+
+		/* We need to find 4 dots and they need to be not blocked in order to move down*/
+
+
+		/* From bottom to top we check the pile */
+		for (row = (ROW - 1); (row >= 0) && (stop == 0); row--){
+
+			for (column = 0; column < COLUMN; column++){
+				if (blockMatrix[row][column] == 1){
+					/* Row 15 reached */
+					if(row == (ROW - 1)) stop = 1;
+					/* Below we have an obstacle*/
+					if (row < (ROW-1)){
+						if(pileMatrix[row + 1][column] == 1)stop = 1;
+					}
+					movedBlock[row][column] = 0;
+					movedBlock[row + 1][column] = 1;
+
+				}
+			}
+		}
+
+		/* After checking the block against the display matrix we take actions*/
+		if (stop == 0){
+
+			for(row = 0; row < ROW; row++){
+				/* Updating the current block */
+				for (column = 0; column < COLUMN; column++) {
+					blockMatrix[row][column] = movedBlock[row][column];
+					displayMatrix[row][column] = (pileMatrix[row][column] | blockMatrix[row][column]);
+				}
+			}
+
+		}else{
+			for(row = 0; row < ROW; row++){
+				/* Updating the current pile with the block which was used to call this function */
+				for (column = 0; column < COLUMN; column++) {
+					pileMatrix[row][column] |= blockMatrix[row][column];
+					displayMatrix[row][column] = pileMatrix[row][column];
+				}
+			}
+			/* No block to move, flag to generate a new one in the engine */
+			blockExists = 0;
+		}
 
 	}
+
 
 	/* This function will check if a complete line has been filled.
 	 * If a row is completed, it will return the line else -1*/
-	int GAME_fullRow(TScreenMatrix currentMatrix){
-		int row = -1;
+	void GAME_checkFullRows(){
+		uint8_t row;
+		uint8_t column;
+		uint8_t dots = 0;
 
-		return row;
+
+		/* From bottom to top we check the pile */
+		for (row = 0; row < ROW; row++){
+			if (dots == 8){
+				GAME_removeRow (row - 1);
+				HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+			}
+			dots = 0;
+			for (column = 0; column < COLUMN; column++){
+				if (pileMatrix[row][column] == 1) dots ++;
+			}
+		}
 	}
 
 	/* this function will remove the row when completed.*/
-	void GAME_removeRow(int row){
+	void GAME_removeRow(int rowFull){
+		int row;
+		uint8_t column;
+
+		/* From bottom to top we check the pile */
+		for (row = rowFull; row >= 0; row--){
+			for (column = 0; column < COLUMN; column++){
+				if (row == 0){
+					pileMatrix[row][column] = 0;
+					displayMatrix[row][column] = 0;
+				}else {
+					pileMatrix[row][column] = pileMatrix[row - 1][column];
+					displayMatrix[row][column] = displayMatrix[row - 1][column];
+				}
+			}
+		}
+		numLines++;
 
 	}
 
@@ -121,6 +303,7 @@
 
 	}
 
+
 	/* Dumps the screenToCopy variable into the screen variable */
 	void GAME_copyScreen(TScreenMatrix screenToCopy){
 		uint8_t i;
@@ -128,7 +311,7 @@
 
 		/* Copy the gameOver screen to the current matrix */
 		for(i = 0; i < ROW; i++){
-			for (j = 0; j < COLUMN; j++)gameMatrix[i][j] = screenToCopy[i][j];
+			for (j = 0; j < COLUMN; j++)displayMatrix[i][j] = screenToCopy[i][j];
 		}
 
 	}
@@ -140,7 +323,132 @@
 
 	/* Game configuration */
 	void GAME_Config(void){
-		GAME_copyScreen(gameIdle);
+		numLines = 0;
+		GAME_copyScreen(gameBlank);
+	}
+
+	/* This function will create a block if there is none */
+	void GAME_CreateBlock(){
+		uint8_t row, column;
+
+		for(row = 0; row < ROW; row++){
+			/* Updating the current Screen */
+			for (column = 0; column < COLUMN; column++) {
+				blockMatrix[row][column] = 0;
+			}
+		}
+
+		/* To DO: Implement a true random generator*/
+		switch(rand() % 7){
+		    /*  o o
+		     *  o o
+		     * */
+			case 0:
+					blockMatrix[0][3] = 1;
+					blockMatrix[0][4] = 1;
+					blockMatrix[1][3] = 1;
+					blockMatrix[1][4] = 1;
+
+					displayMatrix[0][3] = 1;
+					displayMatrix[0][4] = 1;
+					displayMatrix[1][3] = 1;
+					displayMatrix[1][4] = 1;
+				break;
+			case 1:
+			    /*
+			     *  o o o o
+			     * */
+					blockMatrix[0][2] = 1;
+					blockMatrix[0][3] = 1;
+					blockMatrix[0][4] = 1;
+					blockMatrix[0][5] = 1;
+					displayMatrix[0][2] = 1;
+					displayMatrix[0][3] = 1;
+					displayMatrix[0][4] = 1;
+					displayMatrix[0][5] = 1;
+				break;
+			case 2:
+			    /*  o o o
+			     *  o
+			     * */
+					blockMatrix[0][3] = 1;
+					blockMatrix[0][4] = 1;
+					blockMatrix[0][5] = 1;
+					blockMatrix[1][3] = 1;
+					displayMatrix[0][3] = 1;
+					displayMatrix[0][4] = 1;
+					displayMatrix[0][5] = 1;
+					displayMatrix[1][3] = 1;
+				break;
+
+			case 3:
+			    /*  o o o
+			     *      o
+			     * */
+					blockMatrix[0][3] = 1;
+					blockMatrix[0][4] = 1;
+					blockMatrix[0][5] = 1;
+					blockMatrix[1][5] = 1;
+					displayMatrix[0][3] = 1;
+					displayMatrix[0][4] = 1;
+					displayMatrix[0][5] = 1;
+					displayMatrix[1][5] = 1;
+				break;
+			case 4:
+			    /*    o o
+			     *  o o
+			     * */
+
+					blockMatrix[0][4] = 1;
+					blockMatrix[0][5] = 1;
+					blockMatrix[1][3] = 1;
+					blockMatrix[1][4] = 1;
+					displayMatrix[0][4] = 1;
+					displayMatrix[0][5] = 1;
+					displayMatrix[1][3] = 1;
+					displayMatrix[1][4] = 1;
+				break;
+			case 5:
+			    /*  o o
+			     *    o o
+			     * */
+					blockMatrix[0][3] = 1;
+					blockMatrix[0][4] = 1;
+					blockMatrix[1][4] = 1;
+					blockMatrix[1][5] = 1;
+					displayMatrix[0][3] = 1;
+					displayMatrix[0][4] = 1;
+					displayMatrix[1][4] = 1;
+					displayMatrix[1][5] = 1;
+				break;
+			case 6:
+			    /*  o o o
+			     *    o
+			     * */
+					blockMatrix[0][3] = 1;
+					blockMatrix[0][4] = 1;
+					blockMatrix[0][5] = 1;
+					blockMatrix[1][4] = 1;
+					displayMatrix[0][3] = 1;
+					displayMatrix[0][4] = 1;
+					displayMatrix[0][5] = 1;
+					displayMatrix[1][4] = 1;
+				break;
+			default:
+					blockMatrix[2][3] = 1;
+					blockMatrix[0][4] = 1;
+					blockMatrix[0][5] = 1;
+					blockMatrix[2][3] = 1;
+					displayMatrix[2][3] = 1;
+					displayMatrix[0][4] = 1;
+					displayMatrix[0][5] = 1;
+					displayMatrix[2][3] = 1;
+				break;
+		}
+
+
+
+
 	}
 
 	/* nextMove will decide what next move is going to be done by checking the input buttons
@@ -196,7 +504,7 @@
 			timePrev_DOWN = timeNow;
 			if(firstDown == 0){
 				firstDown = 1;
-				repeat_DOWN = LONG_PRESS_MS;
+				repeat_DOWN = LONG_DOWN_MS;
 			}
 		}else{
 			if(firstDown == 1){
@@ -207,7 +515,7 @@
 					/* Long press */
 					move |= (DOWN  & (~down << 2));
 					timePrev_DOWN = timeNow;
-					repeat_DOWN = REPEAT_PRESS_MS;
+					repeat_DOWN = REPEAT_DOWN_MS;
 				}
 			}
 
@@ -296,14 +604,22 @@
 		static uint32_t timeNow = 0;
 		static uint32_t timePrev = 0;
 
-
 		/*##### Function logic #####*/
-		/* After 1000 ms time to move the block down */
 		timeNow = HAL_GetTick();
 
-		if (timeNow - timePrev > 1000){
+		if (blockExists != 1){
+			/* Checking for full rows */
+			GAME_checkFullRows();
+			GAME_CreateBlock();
+			/* Restarting game status variables */
+			blockExists = 1;
+			timePrev = timeNow;
+		}
+
+		/* After TIME_ONE_DOWN in ms time to move the block down */
+		if (timeNow - timePrev > TIME_ONE_DOWN){
 			GAME_moveDown();
-			timeNow = timePrev;
+			timePrev = timeNow;
 		}
 
 		/*## MOVEMENT CONTROL SECTION ##*/
@@ -313,11 +629,9 @@
 		switch (buttons){
 			case LEFT:
 				GAME_moveLeft();
-				HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
 			break;
 			case RIGHT:
 				GAME_moveRight();
-				HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
 			break;
 			case UP:
 				GAME_rotateBlock();
@@ -325,17 +639,16 @@
 			break;
 			case DOWN:
 				GAME_moveToBottom();
-				HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+				/* We don't want the automatic down move to take action while down is pressed by the user */
+				timePrev = timeNow;
 			break;
 			default:
 				//HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
 			break;
 		}
 
-
-
 		/*## BUTTON CONTROL SECTION ENDS ##*/
-		MATRIX_matrixVariableUpdate(gameMatrix);
+		MATRIX_matrixVariableUpdate(displayMatrix);
 	}
 
 

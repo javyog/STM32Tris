@@ -8,6 +8,9 @@
 	#ifndef INC_GAME_H_
 	#define INC_GAME_H_
 
+	/* includes */
+	#include "stdint.h"
+    #include "stdlib.h"
 	#include "stm32f1xx_hal.h"
 	#include "ledMatrix_16x8.h"
 
@@ -16,12 +19,17 @@
 	#define ROW 		16
     /* Count down define before going to sleep*/
 	#define COUNT_DOWN 	5
-
+	/* Time to move the current block one position down in ms */
+	#define TIME_ONE_DOWN 1000
 	/* This is the time to see a long press and repeat the buttons pressed*/
-	#define LONG_PRESS_MS 1000
+	#define LONG_PRESS_MS 700
 
 	/* after long press is detected, this will be the time to repeat the button action*/
-	#define REPEAT_PRESS_MS 300
+	#define REPEAT_PRESS_MS 200
+
+	/* Long press and repeat press for down actions */
+	#define LONG_DOWN_MS 300
+	#define REPEAT_DOWN_MS 75
 
 
 	/*Buttons -> nibble 1, 1, 1, 1*/
@@ -30,8 +38,6 @@
 	#define DOWN		0x4
 	#define UP			0x8
 
-	/* includes */
-	#include <stdint.h>
 
 	/* Functions */
 	/* Game configuration */
@@ -62,15 +68,17 @@
 	/* Function to move the block 1 row down*/
 	void GAME_moveDown();
 
+	/* This function will create a block if there is none */
+	void GAME_CreateBlock();
+
 	/* Show lines killed after GAME OVER */
 	void GAME_showResults();
 
-	/* This function will check if a complete line has been filled.
-	 * If a row is completed, it will return the line else -1*/
-	int GAME_fullRow(TScreenMatrix currentMatrix);
+	/* This function will check for a complete rows after a block is placed in its place */
+	void GAME_checkFullRows();
 
 	/* this function will remove the row when completed.*/
-	void GAME_removeRow(int row);
+	void GAME_removeRow(int rowFull);
 
 	/* Dumps the screenToCopy variable into the screen variable */
 	void GAME_copyScreen(TScreenMatrix screenToCopy);
@@ -79,6 +87,7 @@
 	 * We could show it after the game over screen
 	 * */
 	void GAME_saveScore(uint32_t lines);
+
 
 	#endif /* INC_GAME_H_ */
 
