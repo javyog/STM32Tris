@@ -15,7 +15,10 @@
      * */
 
 	/* Includes */
-	#include "game.h"
+	#include <game.h>
+#include <mxconstants.h>
+#include <stm32f1xx_hal_gpio.h>
+#include <sys/_stdint.h>
 
 
 
@@ -27,10 +30,6 @@
 	 * It will be refreshed inside the game engine if we press a button*/
 	uint8_t sleepCountDown = COUNT_DOWN;
 
-	/* Boolean values to indicate whether there is a block or not */
-	int blockExists = 0;
-
-
 
 	/* After thinking how to represent the block,
 	 * i thought to have a matrix with 4 dots in it and the OR function to display */
@@ -40,7 +39,10 @@
 	/* This variable will hold the current screen status to show in the led matrix*/
 	TScreenMatrix displayMatrix = {{0}};
 
-
+	/* Current game state */
+	currentStatus gameState = IDLE;
+	/* The type of block being played*/
+	typeBlock currentBlock = NONE;
 
 	/*##### Variables ENDS #####*/
 
@@ -55,22 +57,22 @@
 							 *      ..
 							 *    				(15,7)
 							 * */
-									{0,0,0,0,0,0,0,0},
-									{1,1,1,0,1,1,0,0},
-									{0,1,0,0,1,0,1,0},
-									{0,1,0,0,1,0,1,0},
-									{0,1,0,0,1,0,1,0},
-									{1,1,1,0,1,1,0,0},
-									{0,0,0,0,0,0,0,0},
-									{0,0,0,0,0,0,0,0},
-									{0,0,0,0,0,0,0,0},
-									{1,0,0,0,1,1,1,0},
-									{1,0,0,0,1,0,0,0},
-									{1,0,0,0,1,1,1,0},
-									{1,0,0,0,1,0,0,0},
 									{1,1,1,0,1,1,1,0},
+									{0,1,0,0,1,0,0,0},
+									{0,1,0,0,1,1,1,0},
+									{0,1,0,0,1,0,0,0},
+									{0,1,0,0,1,1,1,0},
 									{0,0,0,0,0,0,0,0},
-									{0,0,0,0,0,0,0,0}
+									{1,1,1,0,1,1,0,0},
+									{0,1,0,0,1,0,1,0},
+									{0,1,0,0,1,1,0,0},
+									{0,1,0,0,1,0,1,0},
+									{0,0,0,0,0,0,0,0},
+									{1,1,1,0,0,1,1,0},
+									{0,1,0,0,1,0,0,0},
+									{0,1,0,0,0,1,0,0},
+									{0,1,0,0,0,0,1,0},
+									{1,1,1,0,1,1,0,0}
 								   };
 
 	TScreenMatrix gameBlank = {
@@ -85,6 +87,25 @@
 									{0,0,0,0,0,0,0,0},
 									{0,0,0,0,0,0,0,0},
 									{0,0,0,0,0,0,0,0},
+									{0,0,0,0,0,0,0,0},
+									{0,0,0,0,0,0,0,0},
+									{0,0,0,0,0,0,0,0},
+									{0,0,0,0,0,0,0,0},
+									{0,0,0,0,0,0,0,0}
+								   };
+
+	TScreenMatrix gameOver = {
+									{0,0,0,0,0,0,0,0},
+									{0,0,0,0,0,0,0,0},
+									{0,0,0,0,0,0,0,0},
+									{0,0,0,0,0,0,0,0},
+									{0,0,0,0,0,0,0,0},
+									{0,1,0,1,1,0,1,0},
+									{0,0,1,0,0,1,0,0},
+									{0,1,0,1,1,0,1,0},
+									{0,0,0,0,0,0,0,0},
+									{0,0,0,0,0,0,0,0},
+									{0,0,1,1,1,1,0,0},
 									{0,0,0,0,0,0,0,0},
 									{0,0,0,0,0,0,0,0},
 									{0,0,0,0,0,0,0,0},
@@ -206,32 +227,32 @@
 		TScreenMatrix movedBlock = {{0}};
 		int row;
 		int column;
-		int stop = 0;
+		int dots = 0;
 
 
 		/* We need to find 4 dots and they need to be not blocked in order to move down*/
 
 
 		/* From bottom to top we check the pile */
-		for (row = (ROW - 1); (row >= 0) && (stop == 0); row--){
+		for (row = (ROW - 1); (row >= 0); row--){
 
 			for (column = 0; column < COLUMN; column++){
 				if (blockMatrix[row][column] == 1){
 					/* Row 15 reached */
-					if(row == (ROW - 1)) stop = 1;
+					if(row == (ROW - 1)) break;
 					/* Below we have an obstacle*/
 					if (row < (ROW-1)){
-						if(pileMatrix[row + 1][column] == 1)stop = 1;
+						if(pileMatrix[row + 1][column] == 1)break;
 					}
 					movedBlock[row][column] = 0;
 					movedBlock[row + 1][column] = 1;
-
+					dots++;
 				}
 			}
 		}
 
 		/* After checking the block against the display matrix we take actions*/
-		if (stop == 0){
+		if (dots == 4){
 
 			for(row = 0; row < ROW; row++){
 				/* Updating the current block */
@@ -250,7 +271,7 @@
 				}
 			}
 			/* No block to move, flag to generate a new one in the engine */
-			blockExists = 0;
+			currentBlock = NONE;
 		}
 
 	}
@@ -324,12 +345,15 @@
 	/* Game configuration */
 	void GAME_Config(void){
 		numLines = 0;
-		GAME_copyScreen(gameBlank);
+		GAME_copyScreen(gameIdle);
 	}
 
-	/* This function will create a block if there is none */
+	/* This function will create a block if there is NONE */
 	void GAME_CreateBlock(){
-		uint8_t row, column;
+		uint8_t row;
+		uint8_t column;
+		uint8_t gameFinished = 0;
+
 
 		for(row = 0; row < ROW; row++){
 			/* Updating the current Screen */
@@ -344,11 +368,15 @@
 		     *  o o
 		     * */
 			case 0:
+					/* Checking if we can place a new block */
+					if ((displayMatrix[0][3] == 1) || (displayMatrix[0][4] == 1)||
+						(displayMatrix[1][3] == 1) || (displayMatrix[1][4] == 1)) gameFinished = 1;
+
+					currentBlock = O;
 					blockMatrix[0][3] = 1;
 					blockMatrix[0][4] = 1;
 					blockMatrix[1][3] = 1;
 					blockMatrix[1][4] = 1;
-
 					displayMatrix[0][3] = 1;
 					displayMatrix[0][4] = 1;
 					displayMatrix[1][3] = 1;
@@ -358,6 +386,11 @@
 			    /*
 			     *  o o o o
 			     * */
+					/* Checking if we can place a new block */
+					if ((displayMatrix[0][2] == 1) || (displayMatrix[0][3] == 1)||
+						(displayMatrix[0][4] == 1) || (displayMatrix[0][5] == 1)) gameFinished = 1;
+
+					currentBlock = I;
 					blockMatrix[0][2] = 1;
 					blockMatrix[0][3] = 1;
 					blockMatrix[0][4] = 1;
@@ -371,6 +404,11 @@
 			    /*  o o o
 			     *  o
 			     * */
+					/* Checking if we can place a new block */
+					if ((displayMatrix[0][3] == 1) || (displayMatrix[0][4] == 1)||
+						(displayMatrix[0][5] == 1) || (displayMatrix[1][3] == 1)) gameFinished = 1;
+
+					currentBlock = L;
 					blockMatrix[0][3] = 1;
 					blockMatrix[0][4] = 1;
 					blockMatrix[0][5] = 1;
@@ -385,6 +423,11 @@
 			    /*  o o o
 			     *      o
 			     * */
+					/* Checking if we can place a new block */
+					if ((displayMatrix[0][3] == 1) || (displayMatrix[0][4] == 1)||
+						(displayMatrix[0][5] == 1) || (displayMatrix[1][5] == 1)) gameFinished = 1;
+
+					currentBlock = J;
 					blockMatrix[0][3] = 1;
 					blockMatrix[0][4] = 1;
 					blockMatrix[0][5] = 1;
@@ -398,7 +441,11 @@
 			    /*    o o
 			     *  o o
 			     * */
+					/* Checking if we can place a new block */
+					if ((displayMatrix[0][4] == 1) || (displayMatrix[0][5] == 1)||
+						(displayMatrix[1][3] == 1) || (displayMatrix[1][4] == 1)) gameFinished = 1;
 
+					currentBlock = S;
 					blockMatrix[0][4] = 1;
 					blockMatrix[0][5] = 1;
 					blockMatrix[1][3] = 1;
@@ -412,6 +459,11 @@
 			    /*  o o
 			     *    o o
 			     * */
+					/* Checking if we can place a new block */
+					if ((displayMatrix[0][3] == 1) || (displayMatrix[0][4] == 1)||
+						(displayMatrix[1][4] == 1) || (displayMatrix[1][5] == 1)) gameFinished = 1;
+
+					currentBlock = Z;
 					blockMatrix[0][3] = 1;
 					blockMatrix[0][4] = 1;
 					blockMatrix[1][4] = 1;
@@ -425,6 +477,11 @@
 			    /*  o o o
 			     *    o
 			     * */
+					/* Checking if we can place a new block */
+					if ((displayMatrix[0][4] == 1) || (displayMatrix[0][5] == 1)||
+						(displayMatrix[1][3] == 1) || (displayMatrix[1][4] == 1)) gameFinished = 1;
+
+					currentBlock = T;
 					blockMatrix[0][3] = 1;
 					blockMatrix[0][4] = 1;
 					blockMatrix[0][5] = 1;
@@ -435,6 +492,7 @@
 					displayMatrix[1][4] = 1;
 				break;
 			default:
+					currentBlock = NONE;
 					blockMatrix[2][3] = 1;
 					blockMatrix[0][4] = 1;
 					blockMatrix[0][5] = 1;
@@ -446,7 +504,10 @@
 				break;
 		}
 
-
+		if (gameFinished == 1){
+			gameState = GAME_OVER;
+			GAME_copyScreen(gameOver);
+		}
 
 
 	}
@@ -604,50 +665,67 @@
 		static uint32_t timeNow = 0;
 		static uint32_t timePrev = 0;
 
-		/*##### Function logic #####*/
-		timeNow = HAL_GetTick();
-
-		if (blockExists != 1){
-			/* Checking for full rows */
-			GAME_checkFullRows();
-			GAME_CreateBlock();
-			/* Restarting game status variables */
-			blockExists = 1;
-			timePrev = timeNow;
-		}
-
-		/* After TIME_ONE_DOWN in ms time to move the block down */
-		if (timeNow - timePrev > TIME_ONE_DOWN){
-			GAME_moveDown();
-			timePrev = timeNow;
-		}
-
-		/*## MOVEMENT CONTROL SECTION ##*/
+		/* Buttons pressed by the user */
 		buttons = GAME_nextMove();
 
-		/* If left and right pressed at the same time, don't move (Lighting led pin)*/
-		switch (buttons){
-			case LEFT:
-				GAME_moveLeft();
-			break;
-			case RIGHT:
-				GAME_moveRight();
-			break;
-			case UP:
-				GAME_rotateBlock();
-				HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-			break;
-			case DOWN:
-				GAME_moveToBottom();
-				/* We don't want the automatic down move to take action while down is pressed by the user */
-				timePrev = timeNow;
-			break;
-			default:
-				//HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-			break;
-		}
+		/*## State machine BEGGINS ##*/
+		if (gameState == IDLE){
+			if (buttons == UP) {
+				gameState = PLAYING;
+				GAME_copyScreen(gameBlank);
+				currentBlock = NONE;
+			}
+		}else if(gameState == GAME_OVER){
+			if (buttons == DOWN) {
+				gameState = IDLE;
+				GAME_copyScreen(gameIdle);
+			}
+		}else if(gameState == PLAYING){
 
-		/*## BUTTON CONTROL SECTION ENDS ##*/
+			/*##### Playing logic #####*/
+			timeNow = HAL_GetTick();
+
+			if (currentBlock == NONE){
+				/* Checking for full rows */
+				GAME_checkFullRows();
+				GAME_CreateBlock();
+
+				/* Restarting game status variables */
+				timePrev = timeNow;
+			}
+
+			/* After TIME_ONE_DOWN in ms time to move the block down */
+			if (timeNow - timePrev > TIME_ONE_DOWN){
+				GAME_moveDown();
+				timePrev = timeNow;
+			}
+
+			/* If left and right pressed at the same time, don't move (Lighting led pin)*/
+			switch (buttons){
+				case LEFT:
+					GAME_moveLeft();
+				break;
+				case RIGHT:
+					GAME_moveRight();
+				break;
+				case UP:
+					GAME_rotateBlock();
+					HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+				break;
+				case DOWN:
+					GAME_moveToBottom();
+					/* We don't want the automatic down move to take action while down is pressed by the user */
+					timePrev = timeNow;
+				break;
+				default:
+					//HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+				break;
+			}
+
+
+
+		}
+		/*## State machine ENDS ##*/
 		MATRIX_matrixVariableUpdate(displayMatrix);
 	}
 

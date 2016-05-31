@@ -14,6 +14,14 @@
 	#include "stm32f1xx_hal.h"
 	#include "ledMatrix_16x8.h"
 
+	/* typedefs */
+	/* State machine for controlling the game */
+	/* typedefs */
+	typedef enum TGameState {IDLE, PLAYING, GAME_OVER, SHOW_RESULTS} currentStatus;
+	/* With this variable we will know the current block */
+	typedef enum TBlocks {NONE, O, I, S, Z, L, J, T} typeBlock;
+
+
     /* Matrix rows and columns*/
 	#define COLUMN		8
 	#define ROW 		16
