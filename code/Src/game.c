@@ -6,7 +6,8 @@
  */
 
     /*
-     * ToDO:  * Add state machine. Playing - Game Over - Result Screen
+     * ToDO:  * When moving right or moving down, it would be interesting to do some spaceDown, spaceLeft,
+     * 			spaceRight and only then move the block
      * 		  * Add sound
      * 		  * Change block creation method. Atm I create another blank screen array which has the block and I have to iterate
      * 		 	every time the user press a button. I add the block array to a pile array and then display.
@@ -16,9 +17,9 @@
 
 	/* Includes */
 	#include <game.h>
-#include <mxconstants.h>
-#include <stm32f1xx_hal_gpio.h>
-#include <sys/_stdint.h>
+	#include <mxconstants.h>
+	#include <stm32f1xx_hal_gpio.h>
+	#include <sys/_stdint.h>
 
 
 
@@ -43,6 +44,8 @@
 	currentStatus gameState = IDLE;
 	/* The type of block being played*/
 	typeBlock currentBlock = NONE;
+	/* Current rotation state */
+	uint8_t rotation = 0;
 
 	/*##### Variables ENDS #####*/
 
@@ -122,6 +125,558 @@
 
 	/* This function will rotate the current block */
 	void GAME_rotateBlock(){
+		uint8_t row;
+		uint8_t column;
+		uint8_t found = 0;
+
+		/* o o
+		 * o o
+		 * */
+		if (currentBlock == O) return;
+
+		/*     .
+		 * o o o o
+		 * */
+		if (currentBlock == I){
+			for (row = (ROW - 1); ((row >= 0)&& (found == 0)); row--){
+				for (column = 0; (column <= (COLUMN - 1) && (found == 0)); column++){
+					/* This will be the most left down dot*/
+					if (blockMatrix[row][column] == 1){
+						found = 1;
+						/* o o o o */
+						if (rotation == 0){
+							/* limits with the screen*/
+							if ((row == 0)|| (row >= 14)){
+								return;
+							}else{
+								/* space with the pile for rotation */
+								if (((pileMatrix[row - 1][column + 2]) == 1) ||
+									((pileMatrix[row + 1][column + 2]) == 1) ||
+									((pileMatrix[row + 2][column + 2]) == 1)){
+										/* no space, return*/
+										return;
+								}else{
+									blockMatrix[row - 1][column + 2] = 1;
+									blockMatrix[row + 1][column + 2] = 1;
+									blockMatrix[row + 2][column + 2] = 1;
+									blockMatrix[row][column] = 0;
+									blockMatrix[row][column + 1] = 0;
+									blockMatrix[row][column + 3] = 0;
+									rotation = 1;
+
+								}
+							}
+						}
+						else{
+							 /* o
+							  .	o
+								o
+								o
+							 */
+
+							/* limits with the screen*/
+							if ((column == (COLUMN - 1))|| (column < 2)){
+								return;
+							}else{
+								/* space with the pile for rotation */
+								if (((pileMatrix[row - 2][column - 2]) == 1) ||
+									((pileMatrix[row - 2][column - 1]) == 1) ||
+									((pileMatrix[row - 2][column + 1]) == 1)){
+										/* no space, return*/
+										return;
+								}else{
+									blockMatrix[row - 2][column - 2] = 1;
+									blockMatrix[row - 2][column - 1] = 1;
+									blockMatrix[row - 2][column + 1] = 1;
+									blockMatrix[row][column] = 0;
+									blockMatrix[row - 1][column] = 0;
+									blockMatrix[row - 3][column] = 0;
+									rotation = 1;
+								}
+							}
+
+							rotation = 0;
+						}
+					}
+				}
+			}
+		}
+
+
+		if (currentBlock == S){
+			for (row = (ROW - 1); ((row >= 0)&& (found == 0)); row--){
+				for (column = 0; (column <= (COLUMN - 1) && (found == 0)); column++){
+					/* This will be the most left down dot*/
+					if (blockMatrix[row][column] == 1){
+						found = 1;
+						/*   .
+						 *   o o
+						 * o o
+						 * */
+						if (rotation == 0){
+							/* limits with the screen*/
+							if (row <= 1){
+								return;
+							}else{
+								/* space with the pile for rotation */
+								if (((pileMatrix[row][column + 2]) == 1) ||
+									((pileMatrix[row - 2][column + 1]) == 1)){
+										/* no space, return*/
+										return;
+								}else{
+									blockMatrix[row][column + 2] = 1;
+									blockMatrix[row - 2][column + 1] = 1;
+									blockMatrix[row][column] = 0;
+									blockMatrix[row][column + 1] = 0;
+									rotation = 1;
+
+								}
+							}
+						}
+						else{
+							/*   o
+							 * . o o
+							 *     o
+							 * */
+
+							/* limits with the screen*/
+							if (column <= 1){
+								return;
+							}else{
+								/* space with the pile for rotation */
+								if (((pileMatrix[row][column - 2]) == 1) ||
+									((pileMatrix[row][column - 1]) == 1)){
+										/* no space, return*/
+										return;
+								}else{
+									blockMatrix[row][column - 2] = 1;
+									blockMatrix[row][column - 1] = 1;
+									blockMatrix[row - 2][column - 1] = 0;
+									blockMatrix[row][column] = 0;
+									rotation = 1;
+
+								}
+							}
+
+							rotation = 0;
+						}
+					}
+				}
+
+			}
+		}
+
+		if (currentBlock == Z){
+			for (row = (ROW - 1); ((row >= 0)&& (found == 0)); row--){
+				for (column = 0; (column <= (COLUMN - 1) && (found == 0)); column++){
+					/* This will be the most left down dot*/
+					if (blockMatrix[row][column] == 1){
+						found = 1;
+						/*   .
+						 * o o
+						 *   o o
+						 * */
+						if (rotation == 0){
+							/* limits with the screen*/
+							if (row <= 1){
+								return;
+							}else{
+								/* space with the pile for rotation */
+								if (((pileMatrix[row][column - 1]) == 1) ||
+									((pileMatrix[row - 2][column]) == 1)){
+										/* no space, return*/
+										return;
+								}else{
+									blockMatrix[row][column - 1] = 1;
+									blockMatrix[row - 2][column] = 1;
+									blockMatrix[row][column] = 0;
+									blockMatrix[row][column + 1] = 0;
+									rotation = 1;
+
+								}
+							}
+						}
+						else{
+							/*     o
+							 * . o o
+							 *   o
+							 * */
+
+							/* limits with the screen*/
+							if (column >= 6){
+								return;
+							}else{
+								/* space with the pile for rotation */
+								if (((pileMatrix[row][column + 1]) == 1) ||
+									((pileMatrix[row][column + 2]) == 1)){
+										/* no space, return*/
+										return;
+								}else{
+									blockMatrix[row][column + 1] = 1;
+									blockMatrix[row][column + 2] = 1;
+									blockMatrix[row][column] = 0;
+									blockMatrix[row - 2][column + 1] = 0;
+									rotation = 1;
+
+								}
+							}
+
+							rotation = 0;
+						}
+					}
+				}
+
+			}
+		}
+
+		if (currentBlock == T){
+			for (row = (ROW - 1); ((row >= 0)&& (found == 0)); row--){
+				for (column = 0; (column <= (COLUMN - 1) && (found == 0)); column++){
+					/* This will be the most left down dot*/
+					if (blockMatrix[row][column] == 1){
+						found = 1;
+						/*   .
+						 * o o o
+						 *   o
+						 * */
+						if (rotation == 0){
+							/* limits with the screen*/
+							if (row <= 1){
+								return;
+							}else{
+								/* space with the pile for rotation */
+								if (((pileMatrix[row - 2][column]) == 1)){
+										/* no space, return*/
+										return;
+								}else{
+									blockMatrix[row - 2][column] = 1;
+									blockMatrix[row - 1][column - 1] = 0;
+									rotation = 1;
+
+								}
+							}
+						}
+						else if(rotation == 1){
+							/*   o
+							 * . o o
+							 *   o
+							 * */
+
+							/* limits with the screen*/
+							if (column == 0){
+								return;
+							}else{
+								/* space with the pile for rotation */
+								if (((pileMatrix[row - 1][column - 1]) == 1)){
+										/* no space, return*/
+										return;
+								}else{
+									blockMatrix[row - 1][column - 1] = 1;
+									blockMatrix[row][column] = 0;
+									rotation = 2;
+								}
+							}
+						}
+						else if(rotation == 2){
+							/*   o
+							 * o o o
+							 *   .
+							 * */
+
+							/* limits with the screen*/
+							if (row >= 15){
+								return;
+							}else{
+								/* space with the pile for rotation */
+								if (((pileMatrix[row + 1][column + 1]) == 1)){
+										/* no space, return*/
+										return;
+								}else{
+									blockMatrix[row + 1][column + 1] = 1;
+									blockMatrix[row][column + 2] = 0;
+									rotation = 3;
+								}
+							}
+						}
+						else if(rotation == 3){
+							/*   o
+							 * o o .
+							 *   o
+							 * */
+
+							/* limits with the screen*/
+							if (column >= 7){
+								return;
+							}else{
+								/* space with the pile for rotation */
+								if (((pileMatrix[row - 1][column + 1]) == 1)){
+										/* no space, return*/
+										return;
+								}else{
+									blockMatrix[row - 1][column + 1] = 1;
+									blockMatrix[row - 2][column] = 0;
+									rotation = 0;
+								}
+							}
+						}
+					}
+				}
+
+			}
+		}
+
+
+		if (currentBlock == L){
+			for (row = (ROW - 1); ((row >= 0)&& (found == 0)); row--){
+				for (column = 0; (column <= (COLUMN - 1) && (found == 0)); column++){
+					/* This will be the most left down dot*/
+					if (blockMatrix[row][column] == 1){
+						found = 1;
+						/*   .
+						 * o o o
+						 * o
+						 * */
+						if (rotation == 0){
+							/* limits with the screen*/
+							if (row <= 1){
+								return;
+							}else{
+								/* space with the pile for rotation */
+								if (((pileMatrix[row][column + 1]) == 1) ||
+									((pileMatrix[row][column + 2]) == 1) ||
+									((pileMatrix[row - 2][column + 1]) == 1)){
+										/* no space, return*/
+										return;
+								}else{
+									blockMatrix[row][column + 1] = 1;
+									blockMatrix[row][column + 2] = 1;
+									blockMatrix[row - 2][column + 1] = 1;
+
+									blockMatrix[row][column] = 0;
+									blockMatrix[row - 1][column] = 0;
+									blockMatrix[row - 1][column + 2] = 0;
+									rotation = 1;
+								}
+							}
+						}
+						else if(rotation == 1){
+							/*   o
+							 * . o
+							 *   o o
+							 * */
+
+							/* limits with the screen*/
+							if (column == 0){
+								return;
+							}else{
+								/* space with the pile for rotation */
+								if (((pileMatrix[row - 1][column + 1]) == 1) ||
+									((pileMatrix[row - 2][column + 1]) == 1) ||
+									((pileMatrix[row - 1][column - 1]) == 1)){
+										/* no space, return*/
+										return;
+								}else{
+									blockMatrix[row - 1][column + 1] = 1;
+									blockMatrix[row - 2][column + 1] = 1;
+									blockMatrix[row - 1][column - 1] = 1;
+
+									blockMatrix[row][column] = 0;
+									blockMatrix[row][column + 1] = 0;
+									blockMatrix[row - 2][column] = 0;
+									rotation = 2;
+								}
+							}
+						}
+						else if(rotation == 2){
+							/*     o
+							 * o o o
+							 *   .
+							 * */
+
+							/* limits with the screen*/
+							if (row >= 15){
+								return;
+							}else{
+								/* space with the pile for rotation */
+								if (((pileMatrix[row - 1][column]) == 1) ||
+									((pileMatrix[row - 1][column + 1]) == 1) ||
+									((pileMatrix[row + 1][column + 1]) == 1)){
+										/* no space, return*/
+										return;
+								}else{
+									blockMatrix[row - 1][column] = 1;
+									blockMatrix[row - 1][column + 1] = 1;
+									blockMatrix[row + 1][column + 1] = 1;
+
+									blockMatrix[row][column] = 0;
+									blockMatrix[row][column + 2] = 0;
+									blockMatrix[row - 1][column + 2] = 0;
+									rotation = 3;
+								}
+							}
+						}
+						else if(rotation == 3){
+							/* o o
+							 *   o .
+							 *   o
+							 * */
+
+							/* limits with the screen*/
+							if (column >= 7){
+								return;
+							}else{
+								/* space with the pile for rotation */
+								if (((pileMatrix[row][column - 1]) == 1) ||
+									((pileMatrix[row - 1][column - 1]) == 1) ||
+									((pileMatrix[row - 1][column + 1]) == 1)){
+										/* no space, return*/
+										return;
+								}else{
+									blockMatrix[row][column - 1] = 1;
+									blockMatrix[row - 1][column - 1] = 1;
+									blockMatrix[row - 1][column + 1]= 1;
+
+									blockMatrix[row][column] = 0;
+									blockMatrix[row - 2][column] = 0;
+									blockMatrix[row - 2][column - 1] = 0;
+									rotation = 0;
+								}
+							}
+						}
+					}
+				}
+
+			}
+		}
+
+		if (currentBlock == J){
+			for (row = (ROW - 1); ((row >= 0)&& (found == 0)); row--){
+				for (column = 0; (column <= (COLUMN - 1) && (found == 0)); column++){
+					/* This will be the most left down dot*/
+					if (blockMatrix[row][column] == 1){
+						found = 1;
+						/*   .
+						 * o o o
+						 *     o
+						 * */
+						if (rotation == 0){
+							/* limits with the screen*/
+							if (row <= 1){
+								return;
+							}else{
+								/* space with the pile for rotation */
+								if (((pileMatrix[row][column - 1]) == 1) ||
+									((pileMatrix[row - 2][column]) == 1) ||
+									((pileMatrix[row - 2][column - 1]) == 1)){
+										/* no space, return*/
+										return;
+								}else{
+									blockMatrix[row][column - 1] = 1;
+									blockMatrix[row - 2][column] = 1;
+									blockMatrix[row - 2][column - 1] = 1;
+
+									blockMatrix[row][column] = 0;
+									blockMatrix[row - 1][column] = 0;
+									blockMatrix[row - 1][column - 2] = 0;
+									rotation = 1;
+								}
+							}
+						}
+						else if(rotation == 1){
+							/*   o o
+							 * . o
+							 *   o
+							 * */
+
+							/* limits with the screen*/
+							if (column == 0){
+								return;
+							}else{
+								/* space with the pile for rotation */
+								if (((pileMatrix[row - 1][column + 1]) == 1) ||
+									((pileMatrix[row - 2][column - 1]) == 1) ||
+									((pileMatrix[row - 1][column - 1]) == 1)){
+										/* no space, return*/
+										return;
+								}else{
+									blockMatrix[row - 1][column + 1] = 1;
+									blockMatrix[row - 2][column - 1] = 1;
+									blockMatrix[row - 1][column - 1] = 1;
+
+									blockMatrix[row][column] = 0;
+									blockMatrix[row - 2][column] = 0;
+									blockMatrix[row - 2][column + 1] = 0;
+									rotation = 2;
+								}
+							}
+						}
+						else if(rotation == 2){
+							/* o
+							 * o o o
+							 *   .
+							 * */
+
+							/* limits with the screen*/
+							if (row >= 15){
+								return;
+							}else{
+								/* space with the pile for rotation */
+								if (((pileMatrix[row + 1][column + 1]) == 1) ||
+									((pileMatrix[row + 1][column]) == 1) ||
+									((pileMatrix[row - 1][column + 1]) == 1)){
+										/* no space, return*/
+										return;
+								}else{
+									blockMatrix[row + 1][column + 1] = 1;
+									blockMatrix[row + 1][column] = 1;
+									blockMatrix[row - 1][column + 1] = 1;
+
+									blockMatrix[row][column] = 0;
+									blockMatrix[row - 1][column] = 0;
+									blockMatrix[row][column + 2] = 0;
+									rotation = 3;
+								}
+							}
+						}
+						else if(rotation == 3){
+							/*   o
+							 *   o .
+							 * o o
+							 * */
+
+							/* limits with the screen*/
+							if (column >= 7){
+								return;
+							}else{
+								/* space with the pile for rotation */
+								if (((pileMatrix[row][column + 2]) == 1) ||
+									((pileMatrix[row - 1][column + 2]) == 1) ||
+									((pileMatrix[row - 1][column]) == 1)){
+										/* no space, return*/
+										return;
+								}else{
+									blockMatrix[row][column + 2] = 1;
+									blockMatrix[row - 1][column + 2] = 1;
+									blockMatrix[row - 1][column]= 1;
+
+									blockMatrix[row][column] = 0;
+									blockMatrix[row][column + 1] = 0;
+									blockMatrix[row - 2][column + 1] = 0;
+									rotation = 0;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		/* Updating screen */
+		for(row = 0; row < ROW; row++){
+			/* Updating the current block */
+			for (column = 0; column < COLUMN; column++) {
+				displayMatrix[row][column] = (pileMatrix[row][column] | blockMatrix[row][column]);
+			}
+		}
 
 	}
 
@@ -507,6 +1062,9 @@
 		if (gameFinished == 1){
 			gameState = GAME_OVER;
 			GAME_copyScreen(gameOver);
+		}else{
+			/* If game not finished we got a new block and this will hold itscurrent status */
+			rotation = 0;
 		}
 
 
@@ -662,6 +1220,7 @@
 	void GAME_EngineTask_20ms(void){
 		/*##### Variables #####*/
 		uint8_t buttons;
+		uint8_t row,column;
 		static uint32_t timeNow = 0;
 		static uint32_t timePrev = 0;
 
@@ -672,11 +1231,20 @@
 		if (gameState == IDLE){
 			if (buttons == UP) {
 				gameState = PLAYING;
+				/* Starting game */
 				GAME_copyScreen(gameBlank);
+				/* Restarting PILE */
+				for(row = 0; row < ROW; row++){
+					/* Updating the current Screen */
+					for (column = 0; column < COLUMN; column++) {
+						pileMatrix[row][column] = 0;
+					}
+				}
 				currentBlock = NONE;
+				numLines = 0;
 			}
 		}else if(gameState == GAME_OVER){
-			if (buttons == DOWN) {
+			if (buttons == UP) {
 				gameState = IDLE;
 				GAME_copyScreen(gameIdle);
 			}
@@ -710,7 +1278,7 @@
 				break;
 				case UP:
 					GAME_rotateBlock();
-					HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+
 				break;
 				case DOWN:
 					GAME_moveToBottom();

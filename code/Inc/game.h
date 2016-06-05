@@ -30,14 +30,14 @@
 	/* Time to move the current block one position down in ms */
 	#define TIME_ONE_DOWN 1000
 	/* This is the time to see a long press and repeat the buttons pressed*/
-	#define LONG_PRESS_MS 700
+	#define LONG_PRESS_MS 500
 
 	/* after long press is detected, this will be the time to repeat the button action*/
-	#define REPEAT_PRESS_MS 200
+	#define REPEAT_PRESS_MS 150
 
 	/* Long press and repeat press for down actions */
 	#define LONG_DOWN_MS 300
-	#define REPEAT_DOWN_MS 75
+	#define REPEAT_DOWN_MS 60
 
 
 	/*Buttons -> nibble 1, 1, 1, 1*/
