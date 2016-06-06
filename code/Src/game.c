@@ -832,8 +832,9 @@
 	}
 
 
-	/* This function will check if a complete line has been filled.
-	 * If a row is completed, it will return the line else -1*/
+	/*
+	 * This function will check if a complete line has been filled.
+	 */
 	void GAME_checkFullRows(){
 		uint8_t row;
 		uint8_t column;
@@ -842,13 +843,12 @@
 
 		/* From bottom to top we check the pile */
 		for (row = 0; row < ROW; row++){
-			if (dots == 8){
-				GAME_removeRow (row - 1);
-				HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-			}
 			dots = 0;
 			for (column = 0; column < COLUMN; column++){
 				if (pileMatrix[row][column] == 1) dots ++;
+				if (dots == 8){
+					GAME_removeRow (row);
+				}
 			}
 		}
 	}
@@ -1061,7 +1061,6 @@
 
 		if (gameFinished == 1){
 			gameState = GAME_OVER;
-			GAME_copyScreen(gameOver);
 		}else{
 			/* If game not finished we got a new block and this will hold itscurrent status */
 			rotation = 0;
@@ -1221,6 +1220,7 @@
 		/*##### Variables #####*/
 		uint8_t buttons;
 		uint8_t row,column;
+		static uint8_t gameOver_WAIT = 0;
 		static uint32_t timeNow = 0;
 		static uint32_t timePrev = 0;
 
@@ -1231,6 +1231,7 @@
 		if (gameState == IDLE){
 			if (buttons == UP) {
 				gameState = PLAYING;
+				gameOver_WAIT = 0;
 				/* Starting game */
 				GAME_copyScreen(gameBlank);
 				/* Restarting PILE */
@@ -1244,9 +1245,19 @@
 				numLines = 0;
 			}
 		}else if(gameState == GAME_OVER){
-			if (buttons == UP) {
-				gameState = IDLE;
-				GAME_copyScreen(gameIdle);
+			if(gameOver_WAIT == 0){
+				timeNow = HAL_GetTick();
+				if ((timeNow - timePrev) > 1500){
+					GAME_copyScreen(gameOver);
+					gameOver_WAIT = 1;
+				}
+			}
+			else{
+
+				if (buttons == UP) {
+					gameState = IDLE;
+					GAME_copyScreen(gameIdle);
+				}
 			}
 		}else if(gameState == PLAYING){
 
